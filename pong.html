@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>🏓 Pong — NeonArcade</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="game-shell.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#050510;color:#e0e0e0;font-family:'Rajdhani',sans-serif;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:70px 16px 40px}
+#wrap{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:440px;position:relative;z-index:1}
+h1{font-family:'Orbitron',sans-serif;font-size:1.8rem;font-weight:900;color:#66ccff;text-shadow:0 0 20px #66ccff99;letter-spacing:3px}
+#canvas-wrap{position:relative;border-radius:10px;overflow:hidden;box-shadow:0 0 40px #66ccff22}
+canvas{display:block}
+.btn{padding:10px 28px;background:#66ccff;color:#050510;border:none;border-radius:20px;font-family:'Orbitron',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:transform .15s}
+.btn:hover{transform:scale(1.05)}
+#hint{font-size:.75rem;color:#333;font-family:'Orbitron',sans-serif;text-align:center}
+#diff{display:flex;gap:8px}
+.dbtn{padding:4px 14px;border:1px solid #222;border-radius:16px;background:#0d0d1e;color:#555;cursor:pointer;font-size:.7rem;font-family:'Orbitron',sans-serif;transition:all .2s}
+.dbtn:hover{border-color:#66ccff;color:#66ccff}
+.dbtn.active{background:#66ccff;color:#050510;border-color:#66ccff;font-weight:700}
+</style>
+</head>
+<body>
+<nav class="game-nav"><a href="index.html" class="back-btn">← Hub</a><span class="game-nav-title">🏓 Pong</span><span class="game-nav-hs">🏆 <span id="nav-hs">0</span></span></nav>
+<div id="wrap">
+<h1>🏓 Pong</h1>
+<div id="diff">
+  <button class="dbtn active" data-ai="2">Easy</button>
+  <button class="dbtn" data-ai="4">Medium</button>
+  <button class="dbtn" data-ai="7">Hard</button>
+</div>
+<div id="canvas-wrap"><canvas id="gc" width="400" height="300"></canvas></div>
+<p id="hint">Mouse / Touch to move your paddle (right side)</p>
+<a href="index.html" class="hub-link">🏠 Back to Hub</a>
+</div>
+<script>
+const gc=document.getElementById('gc'),ctx=gc.getContext('2d');
+const W=gc.width,H=gc.height,PW=10,PH=60,BR=7;
+let p1,p2,ball,scores,running,raf,aiSpeed=2,best=parseInt(localStorage.getItem('pongHS')||'0');
+document.getElementById('nav-hs').textContent=best;
+
+function init(){
+  p1={x:10,y:H/2-PH/2,w:PW,h:PH,score:0};
+  p2={x:W-10-PW,y:H/2-PH/2,w:PW,h:PH,score:0};
+  resetBall();running=true;
+  cancelAnimationFrame(raf);loop();
+}
+
+function resetBall(){
+  ball={x:W/2,y:H/2,r:BR,dx:(Math.random()<.5?1:-1)*4,dy:(Math.random()-.5)*6};
+}
+
+function loop(){
+  update();draw();raf=requestAnimationFrame(loop);
+}
+
+function update(){
+  if(!running)return;
+  ball.x+=ball.dx;ball.y+=ball.dy;
+  if(ball.y-ball.r<0){ball.y=ball.r;ball.dy*=-1;}
+  if(ball.y+ball.r>H){ball.y=H-ball.r;ball.dy*=-1;}
+  // AI (left paddle)
+  const aiCenter=p1.y+p1.h/2;
+  if(aiCenter<ball.y-4)p1.y=Math.min(H-PH,p1.y+aiSpeed);
+  else if(aiCenter>ball.y+4)p1.y=Math.max(0,p1.y-aiSpeed);
+  // Paddle collisions
+  [p1,p2].forEach(p=>{
+    if(ball.x-ball.r<p.x+p.w&&ball.x+ball.r>p.x&&ball.y>p.y&&ball.y<p.y+p.h){
+      ball.dx*=-1.05;ball.x=p===p1?p.x+p.w+ball.r:p.x-ball.r;
+      ball.dy+=(ball.y-(p.y+p.h/2))*0.1;
+    }
+  });
+  // Score
+  if(ball.x-ball.r<0){p2.score++;if(p2.score>best){best=p2.score;localStorage.setItem('pongHS',best);document.getElementById('nav-hs').textContent=best;}resetBall();}
+  if(ball.x+ball.r>W){p1.score++;resetBall();}
+}
+
+function draw(){
+  ctx.fillStyle='#0a0a18';ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='#1e1e3a';ctx.setLineDash([8,8]);ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(W/2,0);ctx.lineTo(W/2,H);ctx.stroke();ctx.setLineDash([]);
+  // Scores
+  ctx.fillStyle='#66ccff44';ctx.font='bold 48px Orbitron,sans-serif';ctx.textAlign='center';
+  ctx.fillText(p1.score,W/4,60);ctx.fillText(p2.score,3*W/4,60);
+  // Paddles
+  [p1,p2].forEach((p,i)=>{
+    ctx.fillStyle=i===0?'#66ccff':'#4cff91';ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=12;
+    ctx.beginPath();ctx.roundRect(p.x,p.y,p.w,p.h,4);ctx.fill();ctx.shadowBlur=0;
+  });
+  // Ball
+  ctx.fillStyle='#fff';ctx.shadowColor='#66ccff';ctx.shadowBlur=16;
+  ctx.beginPath();ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+}
+
+// Mouse
+gc.addEventListener('mousemove',e=>{
+  const r=gc.getBoundingClientRect();
+  p2.y=Math.max(0,Math.min(H-PH,(e.clientY-r.top)*(H/r.height)-PH/2));
+});
+gc.addEventListener('touchmove',e=>{
+  e.preventDefault();
+  const r=gc.getBoundingClientRect();
+  p2.y=Math.max(0,Math.min(H-PH,(e.touches[0].clientY-r.top)*(H/r.height)-PH/2));
+},{passive:false});
+
+document.querySelectorAll('.dbtn').forEach(b=>{b.addEventListener('click',()=>{document.querySelector('.dbtn.active').classList.remove('active');b.classList.add('active');aiSpeed=parseInt(b.dataset.ai);init();});});
+init();
+</script>
+</body>
+</html>

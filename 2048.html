@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>🔢 2048 — NeonArcade</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="game-shell.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#050510;color:#e0e0e0;font-family:'Rajdhani',sans-serif;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:70px 16px 40px}
+#wrap{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:420px;position:relative;z-index:1}
+h1{font-family:'Orbitron',sans-serif;font-size:1.8rem;font-weight:900;color:#ff9944;text-shadow:0 0 20px #ff994499;letter-spacing:3px}
+#stats{display:flex;gap:16px;background:#0d0d1e;border:1px solid #1e1e3a;border-radius:12px;padding:8px 20px;width:100%;justify-content:space-around}
+.sb{display:flex;flex-direction:column;align-items:center}.sl{font-size:.6rem;letter-spacing:2px;color:#444;font-family:'Orbitron',sans-serif}.sv{font-size:1rem;font-weight:700;color:#ff9944;font-family:'Orbitron',sans-serif}
+#board{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;background:#0d0d1e;border:1px solid #1e1e3a;border-radius:16px;padding:14px;width:100%;max-width:380px;box-shadow:0 0 40px #ff994422}
+.cell{aspect-ratio:1;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-weight:900;font-size:1.2rem;transition:all .1s;background:#111122;color:#333;border:1px solid #1e1e3a}
+.cell.v2{background:#ff994422;color:#ff9944;border-color:#ff994444;box-shadow:0 0 10px #ff994433}
+.cell.v4{background:#ff994433;color:#ff9944;border-color:#ff994466}
+.cell.v8{background:#ff6c6c33;color:#ff6c6c;border-color:#ff6c6c66}
+.cell.v16{background:#ff6c6c44;color:#ff6c6c;border-color:#ff6c6c88}
+.cell.v32{background:#cc66ff33;color:#cc66ff;border-color:#cc66ff66}
+.cell.v64{background:#cc66ff44;color:#cc66ff;border-color:#cc66ff88}
+.cell.v128{background:#4cff9133;color:#4cff91;border-color:#4cff9166;font-size:1rem}
+.cell.v256{background:#4cff9144;color:#4cff91;border-color:#4cff9188;font-size:1rem}
+.cell.v512{background:#66ccff33;color:#66ccff;border-color:#66ccff66;font-size:1rem}
+.cell.v1024{background:#66ccff44;color:#66ccff;border-color:#66ccff88;font-size:.85rem}
+.cell.v2048{background:#ffcc0044;color:#ffcc00;border-color:#ffcc0088;font-size:.85rem;box-shadow:0 0 20px #ffcc0066}
+.btn{padding:10px 28px;background:#ff9944;color:#050510;border:none;border-radius:20px;font-family:'Orbitron',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:transform .15s}
+.btn:hover{transform:scale(1.05)}
+#msg{font-family:'Orbitron',sans-serif;font-size:.85rem;color:#ff9944;min-height:24px;text-align:center}
+#hint{font-size:.75rem;color:#333;font-family:'Orbitron',sans-serif;text-align:center}
+</style>
+</head>
+<body>
+<nav class="game-nav"><a href="index.html" class="back-btn">← Hub</a><span class="game-nav-title">🔢 2048</span><span class="game-nav-hs">🏆 <span id="nav-hs">0</span></span></nav>
+<div id="wrap">
+<h1>🔢 2048</h1>
+<div id="stats">
+  <div class="sb"><span class="sl">SCORE</span><span class="sv" id="score">0</span></div>
+  <div class="sb"><span class="sl">BEST</span><span class="sv" id="best">0</span></div>
+</div>
+<div id="msg" id="msg"></div>
+<div id="board"></div>
+<button class="btn" id="newBtn">🔄 New Game</button>
+<p id="hint">Arrow Keys or Swipe to move tiles</p>
+<a href="index.html" class="hub-link">🏠 Back to Hub</a>
+</div>
+<script>
+const board=document.getElementById('board');
+let grid,score,best=parseInt(localStorage.getItem('g2048HS')||'0'),won=false;
+document.getElementById('best').textContent=best;
+document.getElementById('nav-hs').textContent=best;
+
+function newGame(){
+  grid=Array.from({length:4},()=>Array(4).fill(0));
+  score=0;won=false;
+  document.getElementById('score').textContent=0;
+  document.getElementById('msg').textContent='';
+  addTile();addTile();render();
+}
+
+function addTile(){
+  const empty=[];
+  grid.forEach((r,ri)=>r.forEach((v,ci)=>{if(!v)empty.push([ri,ci]);}));
+  if(!empty.length)return;
+  const[r,c]=empty[Math.floor(Math.random()*empty.length)];
+  grid[r][c]=Math.random()<.9?2:4;
+}
+
+function render(){
+  board.innerHTML='';
+  grid.forEach(row=>row.forEach(v=>{
+    const d=document.createElement('div');
+    d.className='cell'+(v?' v'+Math.min(v,2048):'');
+    d.textContent=v||'';
+    board.appendChild(d);
+  }));
+  document.getElementById('score').textContent=score;
+  if(score>best){best=score;localStorage.setItem('g2048HS',best);document.getElementById('best').textContent=best;document.getElementById('nav-hs').textContent=best;}
+}
+
+function slide(row){
+  let r=row.filter(v=>v);
+  for(let i=0;i<r.length-1;i++){if(r[i]===r[i+1]){r[i]*=2;score+=r[i];if(r[i]===2048&&!won){won=true;document.getElementById('msg').textContent='🎉 You reached 2048!';}r.splice(i+1,1);}}
+  while(r.length<4)r.push(0);
+  return r;
+}
+
+function move(dir){
+  let moved=false;
+  const g=grid.map(r=>[...r]);
+  if(dir==='left'){grid=grid.map(r=>{const s=slide(r);if(s.join()!==r.join())moved=true;return s;});}
+  else if(dir==='right'){grid=grid.map(r=>{const rev=slide([...r].reverse()).reverse();if(rev.join()!==r.join())moved=true;return rev;});}
+  else if(dir==='up'){
+    for(let c=0;c<4;c++){const col=grid.map(r=>r[c]);const s=slide(col);s.forEach((v,r)=>{if(grid[r][c]!==v)moved=true;grid[r][c]=v;});}
+  }else{
+    for(let c=0;c<4;c++){const col=grid.map(r=>r[c]);const s=slide([...col].reverse()).reverse();s.forEach((v,r)=>{if(grid[r][c]!==v)moved=true;grid[r][c]=v;});}
+  }
+  if(moved){addTile();render();checkLose();}
+}
+
+function checkLose(){
+  for(let r=0;r<4;r++)for(let c=0;c<4;c++){
+    if(!grid[r][c])return;
+    if(c<3&&grid[r][c]===grid[r][c+1])return;
+    if(r<3&&grid[r][c]===grid[r+1][c])return;
+  }
+  document.getElementById('msg').textContent='💀 Game Over! Score: '+score;
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowLeft'){e.preventDefault();move('left');}
+  else if(e.key==='ArrowRight'){e.preventDefault();move('right');}
+  else if(e.key==='ArrowUp'){e.preventDefault();move('up');}
+  else if(e.key==='ArrowDown'){e.preventDefault();move('down');}
+});
+
+let ts=null;
+board.addEventListener('touchstart',e=>{ts={x:e.touches[0].clientX,y:e.touches[0].clientY};},{passive:true});
+board.addEventListener('touchend',e=>{
+  if(!ts)return;
+  const dx=e.changedTouches[0].clientX-ts.x,dy=e.changedTouches[0].clientY-ts.y;
+  if(Math.abs(dx)<20&&Math.abs(dy)<20)return;
+  if(Math.abs(dx)>Math.abs(dy))move(dx>0?'right':'left');else move(dy>0?'down':'up');
+  ts=null;
+},{passive:true});
+
+document.getElementById('newBtn').addEventListener('click',newGame);
+newGame();
+</script>
+</body>
+</html>

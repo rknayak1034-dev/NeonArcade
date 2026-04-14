@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>❌ Tic Tac Toe — NeonArcade</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="game-shell.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#050510;color:#e0e0e0;font-family:'Rajdhani',sans-serif;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:70px 16px 40px}
+#wrap{display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;max-width:380px;position:relative;z-index:1}
+h1{font-family:'Orbitron',sans-serif;font-size:1.8rem;font-weight:900;color:#ff66aa;text-shadow:0 0 20px #ff66aa99;letter-spacing:3px}
+#stats{display:flex;gap:16px;background:#0d0d1e;border:1px solid #1e1e3a;border-radius:12px;padding:8px 20px;width:100%;justify-content:space-around}
+.sb{display:flex;flex-direction:column;align-items:center}.sl{font-size:.6rem;letter-spacing:2px;color:#444;font-family:'Orbitron',sans-serif}.sv{font-size:1rem;font-weight:700;color:#ff66aa;font-family:'Orbitron',sans-serif}
+#board{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:300px}
+.cell{aspect-ratio:1;background:#0d0d1e;border:1px solid #1e1e3a;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:2.8rem;cursor:pointer;transition:all .2s}
+.cell:hover:not(.taken){background:#ff66aa11;border-color:#ff66aa44}
+.cell.x{color:#ff66aa;text-shadow:0 0 14px #ff66aa88}
+.cell.o{color:#66ccff;text-shadow:0 0 14px #66ccff88}
+.cell.win{background:#ff66aa22;border-color:#ff66aa;animation:winPulse .5s ease infinite alternate}
+@keyframes winPulse{from{box-shadow:0 0 10px #ff66aa44}to{box-shadow:0 0 24px #ff66aaaa}}
+#msg{font-family:'Orbitron',sans-serif;font-size:.9rem;color:#ff66aa;min-height:28px;text-align:center}
+.btn{padding:10px 28px;background:#ff66aa;color:#050510;border:none;border-radius:20px;font-family:'Orbitron',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:transform .15s}
+.btn:hover{transform:scale(1.05)}
+#mode{display:flex;gap:8px}
+.mbtn{padding:5px 16px;border:1px solid #222;border-radius:16px;background:#0d0d1e;color:#555;cursor:pointer;font-size:.75rem;font-family:'Orbitron',sans-serif;transition:all .2s}
+.mbtn:hover{border-color:#ff66aa;color:#ff66aa}
+.mbtn.active{background:#ff66aa;color:#050510;border-color:#ff66aa;font-weight:700}
+</style>
+</head>
+<body>
+<nav class="game-nav"><a href="index.html" class="back-btn">← Hub</a><span class="game-nav-title">❌ Tic Tac Toe</span><span class="game-nav-hs">🏆 <span id="nav-hs">0</span></span></nav>
+<div id="wrap">
+<h1>❌ Tic Tac Toe</h1>
+<div id="stats">
+  <div class="sb"><span class="sl">WINS</span><span class="sv" id="wins">0</span></div>
+  <div class="sb"><span class="sl">DRAWS</span><span class="sv" id="draws">0</span></div>
+  <div class="sb"><span class="sl">LOSSES</span><span class="sv" id="losses">0</span></div>
+</div>
+<div id="mode">
+  <button class="mbtn active" id="pvp">👥 2 Player</button>
+  <button class="mbtn" id="pvc">🤖 vs AI</button>
+</div>
+<div id="msg">Your turn — X</div>
+<div id="board"></div>
+<button class="btn" id="newBtn">🔄 New Game</button>
+<a href="index.html" class="hub-link">🏠 Back to Hub</a>
+</div>
+<script>
+let board,turn,over,vsAI=false;
+let wins=parseInt(localStorage.getItem('tttWins')||'0'),draws=parseInt(localStorage.getItem('tttDraws')||'0'),losses=parseInt(localStorage.getItem('tttLosses')||'0');
+document.getElementById('wins').textContent=wins;document.getElementById('draws').textContent=draws;document.getElementById('losses').textContent=losses;document.getElementById('nav-hs').textContent=wins;
+const WINS=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+function newGame(){
+  board=Array(9).fill('');turn='X';over=false;
+  document.getElementById('msg').textContent=vsAI?'Your turn — X':'Player X turn';
+  render();
+}
+
+function render(){
+  const b=document.getElementById('board');b.innerHTML='';
+  board.forEach((v,i)=>{
+    const c=document.createElement('div');c.className='cell'+(v?' taken '+v.toLowerCase():'');
+    c.textContent=v==='X'?'✕':v==='O'?'○':'';
+    c.addEventListener('click',()=>play(i));b.appendChild(c);
+  });
+}
+
+function play(i){
+  if(over||board[i])return;
+  board[i]=turn;
+  const w=checkWin(turn);
+  if(w){endGame(turn,w);}
+  else if(board.every(v=>v)){endGame(null);}
+  else{turn=turn==='X'?'O':'X';document.getElementById('msg').textContent=vsAI&&turn==='O'?'AI thinking...':( vsAI?'Your turn — X':`Player ${turn} turn`);render();if(vsAI&&turn==='O'&&!over)setTimeout(aiMove,400);}
+  render();
+}
+
+function aiMove(){
+  const best=minimax(board,'O');board[best.idx]='O';
+  const w=checkWin('O');
+  if(w){endGame('O',w);}else if(board.every(v=>v)){endGame(null);}
+  else{turn='X';document.getElementById('msg').textContent='Your turn — X';}
+  render();
+}
+
+function minimax(b,player,depth=0){
+  const w=checkWin('O',b);if(w)return{score:10-depth};
+  const l=checkWin('X',b);if(l)return{score:depth-10};
+  if(b.every(v=>v))return{score:0};
+  const moves=[];
+  b.forEach((v,i)=>{if(!v){const nb=[...b];nb[i]=player;const s=minimax(nb,player==='O'?'X':'O',depth+1);moves.push({idx:i,score:s.score});}});
+  return moves.reduce((a,m)=>player==='O'?(m.score>a.score?m:a):(m.score<a.score?m:a));
+}
+
+function checkWin(p,b=board){
+  for(const[a,c,e]of WINS)if(b[a]===p&&b[c]===p&&b[e]===p)return[a,c,e];
+  return null;
+}
+
+function endGame(winner,line){
+  over=true;
+  if(line)line.forEach(i=>document.querySelectorAll('.cell')[i].classList.add('win'));
+  if(winner==='X'){wins++;localStorage.setItem('tttWins',wins);document.getElementById('wins').textContent=wins;document.getElementById('nav-hs').textContent=wins;document.getElementById('msg').textContent=vsAI?'🎉 You Win!':'🎉 Player X Wins!';}
+  else if(winner==='O'){losses++;localStorage.setItem('tttLosses',losses);document.getElementById('losses').textContent=losses;document.getElementById('msg').textContent=vsAI?'🤖 AI Wins!':'🎉 Player O Wins!';}
+  else{draws++;localStorage.setItem('tttDraws',draws);document.getElementById('draws').textContent=draws;document.getElementById('msg').textContent="🤝 It's a Draw!";}
+}
+
+document.getElementById('pvp').addEventListener('click',()=>{vsAI=false;document.getElementById('pvp').classList.add('active');document.getElementById('pvc').classList.remove('active');newGame();});
+document.getElementById('pvc').addEventListener('click',()=>{vsAI=true;document.getElementById('pvc').classList.add('active');document.getElementById('pvp').classList.remove('active');newGame();});
+document.getElementById('newBtn').addEventListener('click',newGame);
+newGame();
+</script>
+</body>
+</html>

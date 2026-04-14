@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>🎵 Simon Says — NeonArcade</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="game-shell.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#050510;color:#e0e0e0;font-family:'Rajdhani',sans-serif;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:70px 16px 40px}
+#wrap{display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;max-width:380px;position:relative;z-index:1}
+h1{font-family:'Orbitron',sans-serif;font-size:1.8rem;font-weight:900;color:#cc66ff;text-shadow:0 0 20px #cc66ff99;letter-spacing:3px}
+#stats{display:flex;gap:16px;background:#0d0d1e;border:1px solid #1e1e3a;border-radius:12px;padding:8px 20px;width:100%;justify-content:space-around}
+.sb{display:flex;flex-direction:column;align-items:center}.sl{font-size:.6rem;letter-spacing:2px;color:#444;font-family:'Orbitron',sans-serif}.sv{font-size:1rem;font-weight:700;color:#cc66ff;font-family:'Orbitron',sans-serif}
+#simon{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:300px}
+.pad{aspect-ratio:1;border-radius:20px;cursor:pointer;transition:all .1s;opacity:.5;border:2px solid transparent;user-select:none;-webkit-tap-highlight-color:transparent}
+.pad.lit{opacity:1;transform:scale(1.05)}
+.pad[data-c="0"]{background:#ff6c6c33;border-color:#ff6c6c44}
+.pad[data-c="1"]{background:#4cff9133;border-color:#4cff9144}
+.pad[data-c="2"]{background:#66ccff33;border-color:#66ccff44}
+.pad[data-c="3"]{background:#ffcc0033;border-color:#ffcc0044}
+.pad[data-c="0"].lit{background:#ff6c6c;border-color:#ff6c6c;box-shadow:0 0 30px #ff6c6c88}
+.pad[data-c="1"].lit{background:#4cff91;border-color:#4cff91;box-shadow:0 0 30px #4cff9188}
+.pad[data-c="2"].lit{background:#66ccff;border-color:#66ccff;box-shadow:0 0 30px #66ccff88}
+.pad[data-c="3"].lit{background:#ffcc00;border-color:#ffcc00;box-shadow:0 0 30px #ffcc0088}
+#msg{font-family:'Orbitron',sans-serif;font-size:.9rem;color:#cc66ff;min-height:28px;text-align:center}
+.btn{padding:10px 28px;background:#cc66ff;color:#050510;border:none;border-radius:20px;font-family:'Orbitron',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:transform .15s}
+.btn:hover{transform:scale(1.05)}
+</style>
+</head>
+<body>
+<nav class="game-nav"><a href="index.html" class="back-btn">← Hub</a><span class="game-nav-title">🎵 Simon Says</span><span class="game-nav-hs">🏆 <span id="nav-hs">0</span></span></nav>
+<div id="wrap">
+<h1>🎵 Simon Says</h1>
+<div id="stats">
+  <div class="sb"><span class="sl">ROUND</span><span class="sv" id="round">0</span></div>
+  <div class="sb"><span class="sl">BEST</span><span class="sv" id="best">0</span></div>
+</div>
+<div id="msg">Press Start to play!</div>
+<div id="simon">
+  <div class="pad" data-c="0"></div>
+  <div class="pad" data-c="1"></div>
+  <div class="pad" data-c="2"></div>
+  <div class="pad" data-c="3"></div>
+</div>
+<button class="btn" id="startBtn">▶ START</button>
+<a href="index.html" class="hub-link">🏠 Back to Hub</a>
+</div>
+<script>
+const COLORS=['#ff6c6c','#4cff91','#66ccff','#ffcc00'];
+let seq=[],step,playing,best=parseInt(localStorage.getItem('simonHS')||'0');
+document.getElementById('best').textContent=best;document.getElementById('nav-hs').textContent=best;
+const pads=document.querySelectorAll('.pad');
+const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+function beep(freq){const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=freq;g.gain.setValueAtTime(.2,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+.3);o.start();o.stop(audioCtx.currentTime+.3);}
+const FREQS=[261,329,392,523];
+
+function newGame(){seq=[];step=0;playing=false;addStep();}
+
+function addStep(){
+  seq.push(Math.floor(Math.random()*4));
+  document.getElementById('round').textContent=seq.length;
+  document.getElementById('msg').textContent='Watch carefully...';
+  document.getElementById('startBtn').style.display='none';
+  pads.forEach(p=>p.style.pointerEvents='none');
+  playSeq();
+}
+
+function playSeq(i=0){
+  if(i>=seq.length){setTimeout(()=>{document.getElementById('msg').textContent='Your turn!';pads.forEach(p=>p.style.pointerEvents='auto');step=0;},400);return;}
+  setTimeout(()=>{
+    const c=seq[i];pads[c].classList.add('lit');beep(FREQS[c]);
+    setTimeout(()=>{pads[c].classList.remove('lit');playSeq(i+1);},400);
+  },i===0?600:0);
+}
+
+pads.forEach(p=>p.addEventListener('click',()=>{
+  if(playing)return;
+  const c=parseInt(p.dataset.c);p.classList.add('lit');beep(FREQS[c]);
+  setTimeout(()=>p.classList.remove('lit'),200);
+  if(c!==seq[step]){
+    document.getElementById('msg').textContent='❌ Wrong! Game Over';
+    if(seq.length-1>best){best=seq.length-1;localStorage.setItem('simonHS',best);document.getElementById('best').textContent=best;document.getElementById('nav-hs').textContent=best;}
+    pads.forEach(p=>p.style.pointerEvents='none');
+    document.getElementById('startBtn').textContent='▶ Play Again';
+    document.getElementById('startBtn').style.display='block';
+    return;
+  }
+  step++;
+  if(step>=seq.length){document.getElementById('msg').textContent='✅ Correct!';pads.forEach(p=>p.style.pointerEvents='none');setTimeout(addStep,800);}
+}));
+
+document.getElementById('startBtn').addEventListener('click',newGame);
+</script>
+</body>
+</html>

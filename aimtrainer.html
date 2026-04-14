@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>🎯 Aim Trainer — NeonArcade</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="game-shell.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#050510;color:#e0e0e0;font-family:'Rajdhani',sans-serif;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:70px 16px 40px}
+#wrap{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:440px;position:relative;z-index:1}
+h1{font-family:'Orbitron',sans-serif;font-size:1.8rem;font-weight:900;color:#ff9944;text-shadow:0 0 20px #ff994499;letter-spacing:3px}
+#stats{display:flex;gap:16px;background:#0d0d1e;border:1px solid #1e1e3a;border-radius:12px;padding:8px 20px;width:100%;justify-content:space-around}
+.sb{display:flex;flex-direction:column;align-items:center}.sl{font-size:.6rem;letter-spacing:2px;color:#444;font-family:'Orbitron',sans-serif}.sv{font-size:1rem;font-weight:700;color:#ff9944;font-family:'Orbitron',sans-serif}
+#arena{position:relative;width:100%;max-width:400px;height:320px;background:#0d0d1e;border:1px solid #1e1e3a;border-radius:14px;overflow:hidden;cursor:crosshair;box-shadow:0 0 30px #ff994411}
+.target{position:absolute;border-radius:50%;cursor:crosshair;transform:translate(-50%,-50%);transition:transform .1s;display:flex;align-items:center;justify-content:center;font-size:1.4rem;animation:targetPop .15s ease}
+@keyframes targetPop{from{transform:translate(-50%,-50%) scale(0)}to{transform:translate(-50%,-50%) scale(1)}}
+.target:hover{transform:translate(-50%,-50%) scale(1.1)}
+#timer-bar-wrap{width:100%;max-width:400px;height:6px;background:#1e1e3a;border-radius:3px;overflow:hidden}
+#timer-bar{height:100%;background:#ff9944;border-radius:3px;transition:width .1s linear}
+.btn{padding:10px 28px;background:#ff9944;color:#050510;border:none;border-radius:20px;font-family:'Orbitron',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:transform .15s}
+.btn:hover{transform:scale(1.05)}
+#msg{font-family:'Orbitron',sans-serif;font-size:.85rem;color:#ff9944;min-height:24px;text-align:center}
+</style>
+</head>
+<body>
+<nav class="game-nav"><a href="index.html" class="back-btn">← Hub</a><span class="game-nav-title">🎯 Aim Trainer</span><span class="game-nav-hs">🏆 <span id="nav-hs">0</span></span></nav>
+<div id="wrap">
+<h1>🎯 Aim Trainer</h1>
+<div id="stats">
+  <div class="sb"><span class="sl">HITS</span><span class="sv" id="hits">0</span></div>
+  <div class="sb"><span class="sl">MISSES</span><span class="sv" id="misses">0</span></div>
+  <div class="sb"><span class="sl">ACC</span><span class="sv" id="acc">—</span></div>
+  <div class="sb"><span class="sl">BEST</span><span class="sv" id="best">0</span></div>
+</div>
+<div id="timer-bar-wrap"><div id="timer-bar" style="width:100%"></div></div>
+<div id="arena"></div>
+<div id="msg">Click START to begin!</div>
+<button class="btn" id="startBtn">▶ START</button>
+<a href="index.html" class="hub-link">🏠 Back to Hub</a>
+</div>
+<script>
+let hits=0,misses=0,timeLeft=30,running=false,timerInterval,best=parseInt(localStorage.getItem('aimHS')||'0');
+document.getElementById('best').textContent=best;document.getElementById('nav-hs').textContent=best;
+const arena=document.getElementById('arena');
+const EMOJIS=['🎯','⭐','💎','🔴','🟡'];
+
+function spawnTarget(){
+  arena.innerHTML='';
+  if(!running)return;
+  const size=30+Math.random()*40;
+  const t=document.createElement('div');
+  t.className='target';
+  t.style.cssText=`width:${size}px;height:${size}px;left:${10+Math.random()*80}%;top:${10+Math.random()*80}%;background:${['#ff6c6c','#4cff91','#ffcc00','#66ccff','#cc66ff'][Math.floor(Math.random()*5)]}33;border:2px solid currentColor;color:${['#ff6c6c','#4cff91','#ffcc00','#66ccff','#cc66ff'][Math.floor(Math.random()*5)]}`;
+  t.textContent=EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+  t.addEventListener('click',e=>{e.stopPropagation();hits++;updateStats();spawnTarget();});
+  arena.appendChild(t);
+}
+
+arena.addEventListener('click',()=>{if(running){misses++;updateStats();}});
+
+function updateStats(){
+  document.getElementById('hits').textContent=hits;
+  document.getElementById('misses').textContent=misses;
+  const total=hits+misses;
+  document.getElementById('acc').textContent=total?Math.round(hits/total*100)+'%':'—';
+}
+
+function startGame(){
+  hits=0;misses=0;timeLeft=30;running=true;
+  document.getElementById('startBtn').style.display='none';
+  document.getElementById('msg').textContent='';
+  updateStats();spawnTarget();
+  timerInterval=setInterval(()=>{
+    timeLeft-=.1;document.getElementById('timer-bar').style.width=(timeLeft/30*100)+'%';
+    if(timeLeft<=0)endGame();
+  },100);
+}
+
+function endGame(){
+  running=false;clearInterval(timerInterval);arena.innerHTML='';
+  if(hits>best){best=hits;localStorage.setItem('aimHS',best);document.getElementById('best').textContent=best;document.getElementById('nav-hs').textContent=best;}
+  const acc=hits+misses?Math.round(hits/(hits+misses)*100):0;
+  document.getElementById('msg').textContent=`Hits: ${hits} | Acc: ${acc}%`;
+  document.getElementById('startBtn').textContent='▶ Play Again';
+  document.getElementById('startBtn').style.display='block';
+  document.getElementById('timer-bar').style.width='0%';
+}
+
+document.getElementById('startBtn').addEventListener('click',startGame);
+</script>
+</body>
+</html>

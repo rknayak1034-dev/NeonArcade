@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>🎰 Whack-a-Mole — NeonArcade</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="game-shell.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#050510;color:#e0e0e0;font-family:'Rajdhani',sans-serif;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:70px 16px 40px}
+#wrap{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:420px;position:relative;z-index:1}
+h1{font-family:'Orbitron',sans-serif;font-size:1.8rem;font-weight:900;color:#ffcc00;text-shadow:0 0 20px #ffcc0099;letter-spacing:3px}
+#stats{display:flex;gap:16px;background:#0d0d1e;border:1px solid #1e1e3a;border-radius:12px;padding:8px 20px;width:100%;justify-content:space-around}
+.sb{display:flex;flex-direction:column;align-items:center}.sl{font-size:.6rem;letter-spacing:2px;color:#444;font-family:'Orbitron',sans-serif}.sv{font-size:1rem;font-weight:700;color:#ffcc00;font-family:'Orbitron',sans-serif}
+#grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:360px}
+.hole{aspect-ratio:1;background:#0d0d1e;border:2px solid #1e1e3a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.8rem;cursor:pointer;transition:all .15s;user-select:none;-webkit-tap-highlight-color:transparent}
+.hole.up{background:#ffcc0022;border-color:#ffcc00;box-shadow:0 0 20px #ffcc0044;animation:popUp .1s ease}
+@keyframes popUp{from{transform:scale(.7)}to{transform:scale(1)}}
+.hole.whacked{background:#ff6c6c22;border-color:#ff6c6c;animation:whack .2s ease}
+@keyframes whack{0%{transform:scale(1.2)}100%{transform:scale(1)}}
+.btn{padding:10px 28px;background:#ffcc00;color:#050510;border:none;border-radius:20px;font-family:'Orbitron',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:transform .15s}
+.btn:hover{transform:scale(1.05)}
+#timer-bar-wrap{width:100%;max-width:360px;height:8px;background:#1e1e3a;border-radius:4px;overflow:hidden}
+#timer-bar{height:100%;background:#ffcc00;border-radius:4px;transition:width .1s linear}
+#diff{display:flex;gap:8px}
+.dbtn{padding:4px 14px;border:1px solid #222;border-radius:16px;background:#0d0d1e;color:#555;cursor:pointer;font-size:.7rem;font-family:'Orbitron',sans-serif;transition:all .2s}
+.dbtn:hover{border-color:#ffcc00;color:#ffcc00}
+.dbtn.active{background:#ffcc00;color:#050510;border-color:#ffcc00;font-weight:700}
+</style>
+</head>
+<body>
+<nav class="game-nav"><a href="index.html" class="back-btn">← Hub</a><span class="game-nav-title">🎰 Whack-a-Mole</span><span class="game-nav-hs">🏆 <span id="nav-hs">0</span></span></nav>
+<div id="wrap">
+<h1>🎰 Whack-a-Mole</h1>
+<div id="stats">
+  <div class="sb"><span class="sl">SCORE</span><span class="sv" id="score">0</span></div>
+  <div class="sb"><span class="sl">MISSES</span><span class="sv" id="misses">0</span></div>
+  <div class="sb"><span class="sl">BEST</span><span class="sv" id="best">0</span></div>
+</div>
+<div id="diff">
+  <button class="dbtn active" data-speed="1000">Easy</button>
+  <button class="dbtn" data-speed="700">Medium</button>
+  <button class="dbtn" data-speed="450">Hard</button>
+</div>
+<div id="timer-bar-wrap"><div id="timer-bar" style="width:100%"></div></div>
+<div id="grid"></div>
+<button class="btn" id="startBtn">▶ START</button>
+<a href="index.html" class="hub-link">🏠 Back to Hub</a>
+</div>
+<script>
+let score=0,misses=0,best=parseInt(localStorage.getItem('wamHS')||'0'),speed=1000,running=false,timeLeft=30,moleTimer,gameTimer,timerInterval,activeMole=-1;
+document.getElementById('best').textContent=best;document.getElementById('nav-hs').textContent=best;
+const MOLES=['🐭','🐹','🐭','🦔','🐭'];
+
+function buildGrid(){
+  const g=document.getElementById('grid');g.innerHTML='';
+  for(let i=0;i<9;i++){
+    const h=document.createElement('div');h.className='hole';h.dataset.i=i;h.textContent='🕳️';
+    h.addEventListener('click',()=>whack(i));g.appendChild(h);
+  }
+}
+
+function startGame(){
+  score=0;misses=0;timeLeft=30;running=true;
+  document.getElementById('score').textContent=0;document.getElementById('misses').textContent=0;
+  document.getElementById('startBtn').textContent='⏹ Stop';
+  buildGrid();showMole();
+  timerInterval=setInterval(()=>{
+    timeLeft--;document.getElementById('timer-bar').style.width=(timeLeft/30*100)+'%';
+    if(timeLeft<=0)endGame();
+  },1000);
+}
+
+function showMole(){
+  if(!running)return;
+  if(activeMole>=0){const h=document.querySelectorAll('.hole')[activeMole];if(h){h.className='hole';h.textContent='🕳️';misses++;document.getElementById('misses').textContent=misses;}}
+  activeMole=Math.floor(Math.random()*9);
+  const h=document.querySelectorAll('.hole')[activeMole];
+  if(h){h.className='hole up';h.textContent=MOLES[Math.floor(Math.random()*MOLES.length)];}
+  moleTimer=setTimeout(showMole,speed);
+}
+
+function whack(i){
+  if(!running||i!==activeMole)return;
+  score++;document.getElementById('score').textContent=score;
+  const h=document.querySelectorAll('.hole')[i];h.className='hole whacked';h.textContent='💥';
+  activeMole=-1;clearTimeout(moleTimer);
+  setTimeout(()=>{if(h){h.className='hole';h.textContent='🕳️';}showMole();},200);
+}
+
+function endGame(){
+  running=false;clearTimeout(moleTimer);clearInterval(timerInterval);
+  if(score>best){best=score;localStorage.setItem('wamHS',best);document.getElementById('best').textContent=best;document.getElementById('nav-hs').textContent=best;}
+  document.getElementById('startBtn').textContent='▶ Play Again';
+  document.querySelectorAll('.hole').forEach(h=>{h.className='hole';h.textContent='🕳️';});
+}
+
+document.getElementById('startBtn').addEventListener('click',()=>{if(running)endGame();else startGame();});
+document.querySelectorAll('.dbtn').forEach(b=>{b.addEventListener('click',()=>{document.querySelector('.dbtn.active').classList.remove('active');b.classList.add('active');speed=parseInt(b.dataset.speed);});});
+buildGrid();
+</script>
+</body>
+</html>

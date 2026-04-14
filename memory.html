@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🃏 Memory Match — NeonArcade</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="game-shell.css"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:#050510;color:#e0e0e0;font-family:'Rajdhani','Segoe UI',sans-serif;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:70px 16px 40px;overflow-x:hidden}
+    #bgCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+    #wrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:440px}
+    h1{font-family:'Orbitron',sans-serif;font-size:1.6rem;font-weight:900;color:#66ccff;text-shadow:0 0 20px #66ccff99;letter-spacing:3px}
+    #stats{display:flex;gap:20px;background:#0d0d1e;border:1px solid #1e1e3a;border-radius:12px;padding:8px 20px;width:100%;justify-content:space-around}
+    .sb{display:flex;flex-direction:column;align-items:center;gap:2px}
+    .sl{font-size:.6rem;letter-spacing:2px;color:#444;font-family:'Orbitron',sans-serif}
+    .sv{font-size:1rem;font-weight:700;color:#66ccff;font-family:'Orbitron',sans-serif}
+    #grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:100%;max-width:380px}
+    .card{aspect-ratio:1;background:#0d0d1e;border:1px solid #1e1e3a;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:2rem;cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s;user-select:none;position:relative;overflow:hidden}
+    .card:hover:not(.flipped):not(.matched){border-color:#66ccff44;transform:scale(1.04)}
+    .card.flipped,.card.matched{border-color:#66ccff;box-shadow:0 0 14px #66ccff33}
+    .card.matched{background:#66ccff11;animation:matchPop .3s ease}
+    @keyframes matchPop{0%{transform:scale(1.2)}100%{transform:scale(1)}}
+    .card-face{font-size:2rem;transition:opacity .15s}
+    .card-back{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:#1e1e3a;background:#0d0d1e}
+    .card.flipped .card-back,.card.matched .card-back{display:none}
+    .card:not(.flipped):not(.matched) .card-face{opacity:0}
+    .btn{padding:10px 28px;background:#66ccff;color:#050510;border:none;border-radius:20px;font-family:'Orbitron',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:transform .15s;margin:4px}
+    .btn:hover{transform:scale(1.05)}
+    #msg{font-family:'Orbitron',sans-serif;font-size:.85rem;color:#66ccff;min-height:24px;text-align:center}
+    #diff-bar{display:flex;gap:8px}
+    .dbtn{padding:4px 14px;border:1px solid #222;border-radius:16px;background:#0d0d1e;color:#555;cursor:pointer;font-size:.7rem;font-family:'Orbitron',sans-serif;transition:all .2s}
+    .dbtn:hover{border-color:#66ccff;color:#66ccff}
+    .dbtn.active{background:#66ccff;color:#050510;border-color:#66ccff;font-weight:700}
+  </style>
+</head>
+<body>
+  <nav class="game-nav">
+    <a href="index.html" class="back-btn">← Hub</a>
+    <span class="game-nav-title">🃏 Memory Match</span>
+    <span class="game-nav-hs">🏆 <span id="nav-hs">0</span></span>
+  </nav>
+  <canvas id="bgCanvas"></canvas>
+  <div id="wrap">
+    <h1>🃏 Memory Match</h1>
+    <div id="stats">
+      <div class="sb"><span class="sl">MOVES</span><span class="sv" id="moves">0</span></div>
+      <div class="sb"><span class="sl">PAIRS</span><span class="sv" id="pairs">0</span></div>
+      <div class="sb"><span class="sl">TIME</span><span class="sv" id="timer">0s</span></div>
+      <div class="sb"><span class="sl">BEST</span><span class="sv" id="best">—</span></div>
+    </div>
+    <div id="diff-bar">
+      <button class="dbtn active" data-size="4">4×4</button>
+      <button class="dbtn" data-size="6">6×4</button>
+    </div>
+    <div id="msg">Find all matching pairs!</div>
+    <div id="grid"></div>
+    <button class="btn" id="newBtn">🔄 New Game</button>
+    <a href="index.html" class="hub-link">🏠 Back to Hub</a>
+  </div>
+  <script src="memory.js"></script>
+</body>
+</html>

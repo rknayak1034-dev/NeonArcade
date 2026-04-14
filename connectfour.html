@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>🔴 Connect Four — NeonArcade</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="game-shell.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#050510;color:#e0e0e0;font-family:'Rajdhani',sans-serif;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:70px 16px 40px}
+#wrap{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:420px;position:relative;z-index:1}
+h1{font-family:'Orbitron',sans-serif;font-size:1.8rem;font-weight:900;color:#ff6c6c;text-shadow:0 0 20px #ff6c6c99;letter-spacing:3px}
+#stats{display:flex;gap:16px;background:#0d0d1e;border:1px solid #1e1e3a;border-radius:12px;padding:8px 20px;width:100%;justify-content:space-around}
+.sb{display:flex;flex-direction:column;align-items:center}.sl{font-size:.6rem;letter-spacing:2px;color:#444;font-family:'Orbitron',sans-serif}.sv{font-size:1rem;font-weight:700;color:#ff6c6c;font-family:'Orbitron',sans-serif}
+#board{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;background:#0d0d1e;border:1px solid #1e1e3a;border-radius:16px;padding:12px;width:100%;max-width:380px;box-shadow:0 0 30px #ff6c6c11}
+.cell{aspect-ratio:1;border-radius:50%;background:#111122;border:1px solid #1e1e3a;cursor:pointer;transition:all .2s}
+.cell:hover{border-color:#ffffff22}
+.cell.p1{background:#ff6c6c;box-shadow:0 0 10px #ff6c6c66;border-color:#ff6c6c}
+.cell.p2{background:#ffcc00;box-shadow:0 0 10px #ffcc0066;border-color:#ffcc00}
+.cell.win{animation:winBlink .4s ease infinite alternate}
+@keyframes winBlink{from{opacity:.6}to{opacity:1;transform:scale(1.1)}}
+#msg{font-family:'Orbitron',sans-serif;font-size:.9rem;min-height:28px;text-align:center}
+.btn{padding:10px 28px;background:#ff6c6c;color:#050510;border:none;border-radius:20px;font-family:'Orbitron',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:transform .15s}
+.btn:hover{transform:scale(1.05)}
+#mode{display:flex;gap:8px}
+.mbtn{padding:5px 16px;border:1px solid #222;border-radius:16px;background:#0d0d1e;color:#555;cursor:pointer;font-size:.75rem;font-family:'Orbitron',sans-serif;transition:all .2s}
+.mbtn:hover{border-color:#ff6c6c;color:#ff6c6c}
+.mbtn.active{background:#ff6c6c;color:#050510;border-color:#ff6c6c;font-weight:700}
+</style>
+</head>
+<body>
+<nav class="game-nav"><a href="index.html" class="back-btn">← Hub</a><span class="game-nav-title">🔴 Connect Four</span><span class="game-nav-hs">🏆 <span id="nav-hs">0</span></span></nav>
+<div id="wrap">
+<h1>🔴 Connect Four</h1>
+<div id="stats">
+  <div class="sb"><span class="sl">🔴 WINS</span><span class="sv" id="p1wins">0</span></div>
+  <div class="sb"><span class="sl">🟡 WINS</span><span class="sv" id="p2wins">0</span></div>
+  <div class="sb"><span class="sl">DRAWS</span><span class="sv" id="draws">0</span></div>
+</div>
+<div id="mode">
+  <button class="mbtn active" id="pvp">👥 2 Player</button>
+  <button class="mbtn" id="pvc">🤖 vs AI</button>
+</div>
+<div id="msg">🔴 Red's turn</div>
+<div id="board"></div>
+<button class="btn" id="newBtn">🔄 New Game</button>
+<a href="index.html" class="hub-link">🏠 Back to Hub</a>
+</div>
+<script>
+const ROWS=6,COLS=7;
+let grid,turn,over,vsAI=false;
+let p1w=parseInt(localStorage.getItem('c4p1')||'0'),p2w=parseInt(localStorage.getItem('c4p2')||'0'),draws=parseInt(localStorage.getItem('c4d')||'0');
+document.getElementById('p1wins').textContent=p1w;document.getElementById('p2wins').textContent=p2w;document.getElementById('draws').textContent=draws;document.getElementById('nav-hs').textContent=p1w;
+
+function newGame(){
+  grid=Array.from({length:ROWS},()=>Array(COLS).fill(0));turn=1;over=false;
+  document.getElementById('msg').textContent='🔴 Red\'s turn';render();
+}
+
+function render(){
+  const b=document.getElementById('board');b.innerHTML='';
+  grid.forEach((row,r)=>row.forEach((v,c)=>{
+    const d=document.createElement('div');d.className='cell'+(v===1?' p1':v===2?' p2':'');
+    d.addEventListener('click',()=>drop(c));b.appendChild(d);
+  }));
+}
+
+function drop(col){
+  if(over)return;
+  for(let r=ROWS-1;r>=0;r--){
+    if(!grid[r][col]){
+      grid[r][col]=turn;
+      const win=checkWin(turn);
+      if(win){endGame(turn,win);}
+      else if(grid[0].every(v=>v)){endGame(0);}
+      else{turn=turn===1?2:1;document.getElementById('msg').textContent=turn===1?'🔴 Red\'s turn':'🟡 Yellow\'s turn';render();if(vsAI&&turn===2&&!over)setTimeout(aiMove,400);}
+      render();return;
+    }
+  }
+}
+
+function aiMove(){
+  // Try to win, then block, then random
+  for(let c=0;c<COLS;c++){const r=getRow(c);if(r>=0){grid[r][c]=2;if(checkWin(2)){grid[r][c]=0;drop(c);return;}grid[r][c]=0;}}
+  for(let c=0;c<COLS;c++){const r=getRow(c);if(r>=0){grid[r][c]=1;if(checkWin(1)){grid[r][c]=0;drop(c);return;}grid[r][c]=0;}}
+  const avail=[];for(let c=0;c<COLS;c++)if(getRow(c)>=0)avail.push(c);
+  drop(avail[Math.floor(Math.random()*avail.length)]);
+}
+
+function getRow(col){for(let r=ROWS-1;r>=0;r--)if(!grid[r][col])return r;return -1;}
+
+function checkWin(p){
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+    const dirs=[[0,1],[1,0],[1,1],[1,-1]];
+    for(const[dr,dc]of dirs){
+      const cells=[[r,c],[r+dr,c+dc],[r+2*dr,c+2*dc],[r+3*dr,c+3*dc]];
+      if(cells.every(([rr,cc])=>rr>=0&&rr<ROWS&&cc>=0&&cc<COLS&&grid[rr][cc]===p))return cells;
+    }
+  }
+  return null;
+}
+
+function endGame(winner,cells){
+  over=true;
+  if(cells){cells.forEach(([r,c])=>{const idx=r*COLS+c;document.querySelectorAll('.cell')[idx].classList.add('win');});}
+  if(winner===1){p1w++;localStorage.setItem('c4p1',p1w);document.getElementById('p1wins').textContent=p1w;document.getElementById('nav-hs').textContent=p1w;document.getElementById('msg').textContent=vsAI?'🎉 You Win!':'🎉 Red Wins!';}
+  else if(winner===2){p2w++;localStorage.setItem('c4p2',p2w);document.getElementById('p2wins').textContent=p2w;document.getElementById('msg').textContent=vsAI?'🤖 AI Wins!':'🎉 Yellow Wins!';}
+  else{draws++;localStorage.setItem('c4d',draws);document.getElementById('draws').textContent=draws;document.getElementById('msg').textContent="🤝 Draw!";}
+}
+
+document.getElementById('pvp').addEventListener('click',()=>{vsAI=false;document.getElementById('pvp').classList.add('active');document.getElementById('pvc').classList.remove('active');newGame();});
+document.getElementById('pvc').addEventListener('click',()=>{vsAI=true;document.getElementById('pvc').classList.add('active');document.getElementById('pvp').classList.remove('active');newGame();});
+document.getElementById('newBtn').addEventListener('click',newGame);
+newGame();
+</script>
+</body>
+</html>

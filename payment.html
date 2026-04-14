@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>💳 NeonArcade — Upgrade to Pro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="payment.css"/>
+</head>
+<body>
+
+  <canvas id="bgCanvas"></canvas>
+
+  <!-- ── NAVBAR ── -->
+  <nav id="navbar">
+    <a href="index.html" class="nav-logo">🎮 <span>NeonArcade</span></a>
+    <div class="nav-secure">🔒 Secure Checkout</div>
+    <a href="index.html" class="nav-back">✕ Cancel</a>
+  </nav>
+
+  <div id="page-wrap">
+
+    <!-- ══ LEFT: Plan + Order Summary ══ -->
+    <div id="left-col">
+
+      <!-- Plan Selector -->
+      <div class="section-card">
+        <h2 class="section-heading">🚀 Choose Your Plan</h2>
+        <div id="plan-grid">
+
+          <div class="plan-card" data-plan="starter" data-price="99" data-label="Starter">
+            <div class="plan-badge">POPULAR</div>
+            <div class="plan-icon">⚡</div>
+            <div class="plan-name">Starter</div>
+            <div class="plan-price">₹99<span>/month</span></div>
+            <ul class="plan-features">
+              <li>✅ All 40 Games</li>
+              <li>✅ No Ads</li>
+              <li>✅ Score Tracking</li>
+              <li>❌ Exclusive Skins</li>
+              <li>❌ Priority Support</li>
+            </ul>
+          </div>
+
+          <div class="plan-card active" data-plan="pro" data-price="199" data-label="Pro">
+            <div class="plan-badge best">BEST VALUE</div>
+            <div class="plan-icon">🏆</div>
+            <div class="plan-name">Pro</div>
+            <div class="plan-price">₹199<span>/month</span></div>
+            <ul class="plan-features">
+              <li>✅ All 40 Games</li>
+              <li>✅ No Ads</li>
+              <li>✅ Score Tracking</li>
+              <li>✅ Exclusive Skins</li>
+              <li>✅ Priority Support</li>
+            </ul>
+          </div>
+
+          <div class="plan-card" data-plan="annual" data-price="999" data-label="Annual Pro">
+            <div class="plan-badge save">SAVE 58%</div>
+            <div class="plan-icon">🐉</div>
+            <div class="plan-name">Annual Pro</div>
+            <div class="plan-price">₹999<span>/year</span></div>
+            <ul class="plan-features">
+              <li>✅ All 40 Games</li>
+              <li>✅ No Ads</li>
+              <li>✅ Score Tracking</li>
+              <li>✅ Exclusive Skins</li>
+              <li>✅ Priority Support</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="section-card" id="order-summary">
+        <h2 class="section-heading">🧾 Order Summary</h2>
+        <div class="summary-row"><span id="sum-plan-name">Pro Plan</span><span id="sum-plan-price">₹199</span></div>
+        <div class="summary-row discount-row hidden" id="discount-row">
+          <span>🎟️ Promo Discount</span><span id="discount-val" class="green">-₹0</span>
+        </div>
+        <div class="summary-row tax-row"><span>GST (18%)</span><span id="sum-tax">₹35.82</span></div>
+        <div class="summary-divider"></div>
+        <div class="summary-row total-row"><span>Total</span><span id="sum-total">₹234.82</span></div>
+        <div class="promo-wrap">
+          <input type="text" id="promo-input" placeholder="Enter promo code"/>
+          <button id="promo-btn">Apply</button>
+        </div>
+        <div id="promo-msg"></div>
+        <div class="trust-badges">
+          <span>🔒 SSL Secured</span>
+          <span>✅ PCI Compliant</span>
+          <span>↩️ 7-Day Refund</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══ RIGHT: Payment Form ══ -->
+    <div id="right-col">
+      <div class="section-card" id="payment-card">
+        <h2 class="section-heading">💳 Payment Details</h2>
+
+        <!-- Payment Method Tabs -->
+        <div id="method-tabs">
+          <button class="method-tab active" data-method="upi">
+            <span class="tab-icon">📱</span>
+            <span class="tab-label">UPI</span>
+          </button>
+          <button class="method-tab" data-method="card">
+            <span class="tab-icon">💳</span>
+            <span class="tab-label">Card</span>
+          </button>
+          <button class="method-tab" data-method="emi">
+            <span class="tab-icon">📅</span>
+            <span class="tab-label">EMI</span>
+          </button>
+          <button class="method-tab" data-method="netbanking">
+            <span class="tab-icon">🏦</span>
+            <span class="tab-label">Net Banking</span>
+          </button>
+        </div>
+
+        <!-- ── UPI PANEL ── -->
+        <div id="panel-upi" class="method-panel active">
+          <p class="panel-desc">Pay instantly using any UPI app</p>
+
+          <div class="upi-apps">
+            <div class="upi-app active" data-app="gpay">
+              <span class="upi-app-icon">🟢</span>
+              <span>GPay</span>
+            </div>
+            <div class="upi-app" data-app="phonepe">
+              <span class="upi-app-icon">🟣</span>
+              <span>PhonePe</span>
+            </div>
+            <div class="upi-app" data-app="paytm">
+              <span class="upi-app-icon">🔵</span>
+              <span>Paytm</span>
+            </div>
+            <div class="upi-app" data-app="bhim">
+              <span class="upi-app-icon">🟠</span>
+              <span>BHIM</span>
+            </div>
+            <div class="upi-app" data-app="other">
+              <span class="upi-app-icon">➕</span>
+              <span>Other</span>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>UPI ID</label>
+            <div class="input-wrap">
+              <span class="input-icon">📱</span>
+              <input type="text" id="upi-id" placeholder="yourname@upi" autocomplete="off"/>
+              <span class="input-suffix" id="upi-verify-btn">Verify</span>
+            </div>
+            <span class="field-hint">e.g. name@okaxis, name@ybl, name@paytm</span>
+            <span class="field-error" id="upi-err"></span>
+          </div>
+
+          <div id="upi-verified" class="verified-badge hidden">
+            ✅ UPI ID verified — <strong id="upi-name-display"></strong>
+          </div>
+
+          <div class="qr-option">
+            <button class="qr-toggle-btn" id="qrToggleBtn">📷 Show QR Code Instead</button>
+            <div id="qr-box" class="hidden">
+              <div id="qr-placeholder">
+                <div class="qr-mock">
+                  <div class="qr-inner">
+                    <div class="qr-logo">🎮</div>
+                  </div>
+                </div>
+                <p class="qr-hint">Scan with any UPI app</p>
+                <p class="qr-amount" id="qr-amount">₹234.82</p>
+              </div>
+            </div>
+          </div>
+
+          <button class="pay-btn" id="upiPayBtn">
+            <span class="pay-icon">📱</span>
+            <span>Pay <span class="pay-amount" id="upi-pay-amount">₹234.82</span> via UPI</span>
+          </button>
+        </div>
+
+        <!-- ── CARD PANEL ── -->
+        <div id="panel-card" class="method-panel">
+          <p class="panel-desc">Credit Card · Debit Card · Prepaid Card</p>
+
+          <div class="card-preview" id="card-preview">
+            <div class="card-preview-inner">
+              <div class="card-chip">▬▬</div>
+              <div class="card-number-display" id="card-num-display">•••• •••• •••• ••••</div>
+              <div class="card-bottom">
+                <div>
+                  <div class="card-label-sm">CARD HOLDER</div>
+                  <div class="card-holder-display" id="card-holder-display">YOUR NAME</div>
+                </div>
+                <div>
+                  <div class="card-label-sm">EXPIRES</div>
+                  <div class="card-expiry-display" id="card-expiry-display">MM/YY</div>
+                </div>
+                <div class="card-brand-display" id="card-brand-display">💳</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>Card Number</label>
+            <div class="input-wrap">
+              <span class="input-icon">💳</span>
+              <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19" autocomplete="cc-number"/>
+              <span class="card-type-badge" id="card-type-badge"></span>
+            </div>
+            <span class="field-error" id="card-num-err"></span>
+          </div>
+
+          <div class="input-group">
+            <label>Cardholder Name</label>
+            <div class="input-wrap">
+              <span class="input-icon">👤</span>
+              <input type="text" id="card-name" placeholder="Name as on card" autocomplete="cc-name"/>
+            </div>
+            <span class="field-error" id="card-name-err"></span>
+          </div>
+
+          <div class="input-row">
+            <div class="input-group">
+              <label>Expiry Date</label>
+              <div class="input-wrap">
+                <span class="input-icon">📅</span>
+                <input type="text" id="card-expiry" placeholder="MM/YY" maxlength="5" autocomplete="cc-exp"/>
+              </div>
+              <span class="field-error" id="card-exp-err"></span>
+            </div>
+            <div class="input-group">
+              <label>CVV <span class="label-hint">(?)</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="card-cvv" placeholder="•••" maxlength="4" autocomplete="cc-csc"/>
+              </div>
+              <span class="field-error" id="card-cvv-err"></span>
+            </div>
+          </div>
+
+          <label class="checkbox-wrap">
+            <input type="checkbox" id="save-card"/>
+            <span class="checkmark"></span>
+            <span>Save card for future payments</span>
+          </label>
+
+          <button class="pay-btn card-pay" id="cardPayBtn">
+            <span class="pay-icon">💳</span>
+            <span>Pay <span class="pay-amount" id="card-pay-amount">₹234.82</span> Securely</span>
+          </button>
+        </div>
+
+        <!-- ── EMI PANEL ── -->
+        <div id="panel-emi" class="method-panel">
+          <p class="panel-desc">Split your payment into easy monthly installments</p>
+
+          <div class="emi-banks">
+            <div class="emi-bank active" data-bank="hdfc">HDFC</div>
+            <div class="emi-bank" data-bank="sbi">SBI</div>
+            <div class="emi-bank" data-bank="icici">ICICI</div>
+            <div class="emi-bank" data-bank="axis">Axis</div>
+            <div class="emi-bank" data-bank="kotak">Kotak</div>
+          </div>
+
+          <div id="emi-plans">
+            <div class="emi-plan-row active" data-months="3">
+              <div class="emi-radio"><div class="emi-radio-dot"></div></div>
+              <div class="emi-info">
+                <div class="emi-months">3 Months</div>
+                <div class="emi-detail" id="emi-3">₹78.27/mo · 0% interest</div>
+              </div>
+              <div class="emi-total" id="emi-3-total">₹234.82</div>
+            </div>
+            <div class="emi-plan-row" data-months="6">
+              <div class="emi-radio"><div class="emi-radio-dot"></div></div>
+              <div class="emi-info">
+                <div class="emi-months">6 Months</div>
+                <div class="emi-detail" id="emi-6">₹40.47/mo · 2% interest</div>
+              </div>
+              <div class="emi-total" id="emi-6-total">₹242.82</div>
+            </div>
+            <div class="emi-plan-row" data-months="12">
+              <div class="emi-radio"><div class="emi-radio-dot"></div></div>
+              <div class="emi-info">
+                <div class="emi-months">12 Months</div>
+                <div class="emi-detail" id="emi-12">₹21.23/mo · 5% interest</div>
+              </div>
+              <div class="emi-total" id="emi-12-total">₹254.82</div>
+            </div>
+          </div>
+
+          <div class="input-group" style="margin-top:16px">
+            <label>Card Number (for EMI)</label>
+            <div class="input-wrap">
+              <span class="input-icon">💳</span>
+              <input type="text" id="emi-card" placeholder="1234 5678 9012 3456" maxlength="19"/>
+            </div>
+            <span class="field-error" id="emi-card-err"></span>
+          </div>
+
+          <div class="emi-summary-box" id="emi-summary">
+            <div class="emi-sum-row"><span>Selected Plan</span><span id="emi-sel-plan">3 Months</span></div>
+            <div class="emi-sum-row"><span>Monthly EMI</span><span id="emi-sel-emi">₹78.27</span></div>
+            <div class="emi-sum-row"><span>Total Amount</span><span id="emi-sel-total">₹234.82</span></div>
+          </div>
+
+          <button class="pay-btn emi-pay" id="emiPayBtn">
+            <span class="pay-icon">📅</span>
+            <span>Pay <span id="emi-pay-amount">₹78.27</span>/mo via EMI</span>
+          </button>
+        </div>
+
+        <!-- ── NET BANKING PANEL ── -->
+        <div id="panel-netbanking" class="method-panel">
+          <p class="panel-desc">Pay directly from your bank account</p>
+
+          <div class="nb-popular-label">Popular Banks</div>
+          <div id="nb-banks-grid">
+            <div class="nb-bank active" data-bank="sbi">
+              <span class="nb-icon">🏦</span><span>SBI</span>
+            </div>
+            <div class="nb-bank" data-bank="hdfc">
+              <span class="nb-icon">🏦</span><span>HDFC</span>
+            </div>
+            <div class="nb-bank" data-bank="icici">
+              <span class="nb-icon">🏦</span><span>ICICI</span>
+            </div>
+            <div class="nb-bank" data-bank="axis">
+              <span class="nb-icon">🏦</span><span>Axis</span>
+            </div>
+            <div class="nb-bank" data-bank="kotak">
+              <span class="nb-icon">🏦</span><span>Kotak</span>
+            </div>
+            <div class="nb-bank" data-bank="pnb">
+              <span class="nb-icon">🏦</span><span>PNB</span>
+            </div>
+            <div class="nb-bank" data-bank="bob">
+              <span class="nb-icon">🏦</span><span>BOB</span>
+            </div>
+            <div class="nb-bank" data-bank="canara">
+              <span class="nb-icon">🏦</span><span>Canara</span>
+            </div>
+          </div>
+
+          <div class="input-group" style="margin-top:14px">
+            <label>Or select from all banks</label>
+            <div class="input-wrap">
+              <span class="input-icon">🏦</span>
+              <select id="nb-select">
+                <option value="">-- Select Your Bank --</option>
+                <option>Allahabad Bank</option>
+                <option>Andhra Bank</option>
+                <option>AU Small Finance Bank</option>
+                <option>Axis Bank</option>
+                <option>Bandhan Bank</option>
+                <option>Bank of Baroda</option>
+                <option>Bank of India</option>
+                <option>Canara Bank</option>
+                <option>Central Bank of India</option>
+                <option>City Union Bank</option>
+                <option>DCB Bank</option>
+                <option>Dhanlaxmi Bank</option>
+                <option>Federal Bank</option>
+                <option>HDFC Bank</option>
+                <option>ICICI Bank</option>
+                <option>IDBI Bank</option>
+                <option>IDFC First Bank</option>
+                <option>Indian Bank</option>
+                <option>Indian Overseas Bank</option>
+                <option>IndusInd Bank</option>
+                <option>Jammu & Kashmir Bank</option>
+                <option>Karnataka Bank</option>
+                <option>Karur Vysya Bank</option>
+                <option>Kotak Mahindra Bank</option>
+                <option>Lakshmi Vilas Bank</option>
+                <option>Nainital Bank</option>
+                <option>Punjab National Bank</option>
+                <option>RBL Bank</option>
+                <option>Saraswat Bank</option>
+                <option>South Indian Bank</option>
+                <option>State Bank of India</option>
+                <option>Syndicate Bank</option>
+                <option>Tamilnad Mercantile Bank</option>
+                <option>UCO Bank</option>
+                <option>Union Bank of India</option>
+                <option>United Bank of India</option>
+                <option>Vijaya Bank</option>
+                <option>Yes Bank</option>
+              </select>
+            </div>
+            <span class="field-error" id="nb-err"></span>
+          </div>
+
+          <div class="nb-info-box">
+            <span>ℹ️</span>
+            <span>You will be redirected to your bank's secure login page to complete the payment.</span>
+          </div>
+
+          <button class="pay-btn nb-pay" id="nbPayBtn">
+            <span class="pay-icon">🏦</span>
+            <span>Pay <span class="pay-amount" id="nb-pay-amount">₹234.82</span> via Net Banking</span>
+          </button>
+        </div>
+
+        <!-- Security note -->
+        <div class="security-note">
+          <span>🔒</span>
+          <span>Your payment is encrypted with 256-bit SSL. We never store your card details.</span>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── PROCESSING OVERLAY ── -->
+  <div id="processing-overlay" class="hidden">
+    <div id="processing-box">
+      <div class="proc-spinner"></div>
+      <h3 id="proc-title">Processing Payment...</h3>
+      <p id="proc-msg">Please do not close this window</p>
+      <div class="proc-steps">
+        <div class="proc-step active" id="step1">🔐 Encrypting data</div>
+        <div class="proc-step" id="step2">📡 Connecting to bank</div>
+        <div class="proc-step" id="step3">✅ Confirming payment</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SUCCESS OVERLAY ── -->
+  <div id="success-overlay" class="hidden">
+    <div id="success-box">
+      <div class="success-anim">🎉</div>
+      <h2>Payment Successful!</h2>
+      <p id="success-plan-msg">You are now a Pro member!</p>
+      <div class="receipt-box">
+        <div class="receipt-row"><span>Transaction ID</span><span id="txn-id"></span></div>
+        <div class="receipt-row"><span>Amount Paid</span><span id="txn-amount"></span></div>
+        <div class="receipt-row"><span>Plan</span><span id="txn-plan"></span></div>
+        <div class="receipt-row"><span>Date</span><span id="txn-date"></span></div>
+        <div class="receipt-row"><span>Status</span><span class="green">✅ SUCCESS</span></div>
+      </div>
+      <div class="success-btns">
+        <button class="sbtn primary" id="goHubBtn">🎮 Start Playing</button>
+        <button class="sbtn ghost" id="downloadReceiptBtn">📄 Download Receipt</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="hidden"></div>
+
+  <script src="payment.js"></script>
+</body>
+</html>

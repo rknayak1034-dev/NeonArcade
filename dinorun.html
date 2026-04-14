@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>🏃 Dino Run — NeonArcade</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="game-shell.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#050510;color:#e0e0e0;font-family:'Rajdhani',sans-serif;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:70px 16px 40px}
+#wrap{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:440px;position:relative;z-index:1}
+h1{font-family:'Orbitron',sans-serif;font-size:1.8rem;font-weight:900;color:#4cff91;text-shadow:0 0 20px #4cff9199;letter-spacing:3px}
+#stats{display:flex;gap:16px;background:#0d0d1e;border:1px solid #1e1e3a;border-radius:12px;padding:8px 20px;width:100%;justify-content:space-around}
+.sb{display:flex;flex-direction:column;align-items:center}.sl{font-size:.6rem;letter-spacing:2px;color:#444;font-family:'Orbitron',sans-serif}.sv{font-size:1rem;font-weight:700;color:#4cff91;font-family:'Orbitron',sans-serif}
+#canvas-wrap{position:relative;border-radius:10px;overflow:hidden;box-shadow:0 0 40px #4cff9122;cursor:pointer}
+canvas{display:block}
+#hint{font-size:.75rem;color:#333;font-family:'Orbitron',sans-serif;text-align:center}
+</style>
+</head>
+<body>
+<nav class="game-nav"><a href="index.html" class="back-btn">← Hub</a><span class="game-nav-title">🏃 Dino Run</span><span class="game-nav-hs">🏆 <span id="nav-hs">0</span></span></nav>
+<div id="wrap">
+<h1>🏃 Dino Run</h1>
+<div id="stats">
+  <div class="sb"><span class="sl">SCORE</span><span class="sv" id="score">0</span></div>
+  <div class="sb"><span class="sl">BEST</span><span class="sv" id="best">0</span></div>
+</div>
+<div id="canvas-wrap"><canvas id="gc" width="400" height="200"></canvas></div>
+<p id="hint">Space / Tap to jump · Double jump allowed!</p>
+<a href="index.html" class="hub-link">🏠 Back to Hub</a>
+</div>
+<script>
+const gc=document.getElementById('gc'),ctx=gc.getContext('2d');
+const W=gc.width,H=gc.height,GY=H-40;
+let dino,obstacles,score,best=parseInt(localStorage.getItem('dinoHS')||'0'),state,raf,speed,frame;
+document.getElementById('best').textContent=best;document.getElementById('nav-hs').textContent=best;
+
+function init(){
+  dino={x:60,y:GY,w:30,h:40,vy:0,jumps:0};
+  obstacles=[];score=0;speed=4;frame=0;state='idle';
+  cancelAnimationFrame(raf);loop();
+}
+
+function jump(){
+  if(state==='idle'){state='running';return;}
+  if(state==='dead'){init();return;}
+  if(dino.jumps<2){dino.vy=-12;dino.jumps++;}
+}
+
+function loop(){
+  update();draw();raf=requestAnimationFrame(loop);
+}
+
+function update(){
+  if(state!=='running')return;
+  frame++;score++;speed=4+Math.floor(score/300)*0.5;
+  document.getElementById('score').textContent=score;
+  if(score>best){best=score;localStorage.setItem('dinoHS',best);document.getElementById('best').textContent=best;document.getElementById('nav-hs').textContent=best;}
+  // Dino physics
+  dino.vy+=0.7;dino.y+=dino.vy;
+  if(dino.y>=GY){dino.y=GY;dino.vy=0;dino.jumps=0;}
+  // Spawn obstacles
+  if(frame%Math.max(60,120-Math.floor(score/200)*5)===0){
+    const h=20+Math.random()*30;
+    obstacles.push({x:W,y:GY+dino.h-h,w:18,h});
+  }
+  obstacles.forEach(o=>o.x-=speed);
+  obstacles=obstacles.filter(o=>o.x+o.w>0);
+  // Collision
+  for(const o of obstacles){
+    if(dino.x+dino.w-4>o.x&&dino.x+4<o.x+o.w&&dino.y+dino.h-4>o.y&&dino.y+4<o.y+o.h){state='dead';}
+  }
+}
+
+function draw(){
+  ctx.fillStyle='#0a0a18';ctx.fillRect(0,0,W,H);
+  // Ground
+  ctx.strokeStyle='#1e1e3a';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,GY+dino.h);ctx.lineTo(W,GY+dino.h);ctx.stroke();
+  // Dino
+  ctx.font=`${dino.h}px serif`;ctx.textAlign='left';
+  ctx.fillText(state==='dead'?'💀':'🦕',dino.x,dino.y+dino.h);
+  // Obstacles
+  obstacles.forEach(o=>{
+    ctx.fillStyle='#ff6c6c';ctx.shadowColor='#ff6c6c';ctx.shadowBlur=8;
+    ctx.fillRect(o.x,o.y,o.w,o.h);ctx.shadowBlur=0;
+  });
+  // Score
+  ctx.fillStyle='#4cff9144';ctx.font='bold 14px Orbitron,sans-serif';ctx.textAlign='right';
+  ctx.fillText(score,W-10,20);
+  // Overlays
+  if(state==='idle'){
+    ctx.fillStyle='#05051099';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#4cff91';ctx.font='bold 18px Orbitron,sans-serif';ctx.textAlign='center';
+    ctx.fillText('🏃 DINO RUN',W/2,H/2-20);
+    ctx.fillStyle='#fff';ctx.font='13px Orbitron,sans-serif';
+    ctx.fillText('Tap or Space to Start',W/2,H/2+10);
+  }
+  if(state==='dead'){
+    ctx.fillStyle='#05051099';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#ff6c6c';ctx.font='bold 18px Orbitron,sans-serif';ctx.textAlign='center';
+    ctx.fillText('💀 GAME OVER',W/2,H/2-20);
+    ctx.fillStyle='#fff';ctx.font='13px Orbitron,sans-serif';
+    ctx.fillText('Score: '+score+' | Best: '+best,W/2,H/2+10);
+    ctx.fillStyle='#4cff91';ctx.fillText('Tap to Restart',W/2,H/2+34);
+  }
+}
+
+gc.addEventListener('click',jump);
+gc.addEventListener('touchend',e=>{e.preventDefault();jump();},{passive:false});
+document.addEventListener('keydown',e=>{if(e.code==='Space'||e.code==='ArrowUp'){e.preventDefault();jump();}});
+init();
+</script>
+</body>
+</html>

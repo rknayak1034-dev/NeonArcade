@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🐦 Flappy Neon — NeonArcade</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="game-shell.css"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:#050510;color:#e0e0e0;font-family:'Rajdhani','Segoe UI',sans-serif;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:70px 16px 40px;overflow-x:hidden}
+    #bgCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+    #wrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:360px}
+    h1{font-family:'Orbitron',sans-serif;font-size:1.6rem;font-weight:900;color:#ffcc00;text-shadow:0 0 20px #ffcc0099;letter-spacing:3px}
+    #stats{display:flex;gap:20px;background:#0d0d1e;border:1px solid #1e1e3a;border-radius:12px;padding:8px 20px;width:100%;justify-content:space-around}
+    .sb{display:flex;flex-direction:column;align-items:center;gap:2px}
+    .sl{font-size:.6rem;letter-spacing:2px;color:#444;font-family:'Orbitron',sans-serif}
+    .sv{font-size:1rem;font-weight:700;color:#ffcc00;font-family:'Orbitron',sans-serif}
+    #canvas-wrap{position:relative;border-radius:10px;overflow:hidden;box-shadow:0 0 40px #ffcc0022;cursor:pointer}
+    canvas{display:block}
+    #hint{font-size:.75rem;color:#333;font-family:'Orbitron',sans-serif;text-align:center}
+  </style>
+</head>
+<body>
+  <nav class="game-nav">
+    <a href="index.html" class="back-btn">← Hub</a>
+    <span class="game-nav-title">🐦 Flappy Neon</span>
+    <span class="game-nav-hs">🏆 <span id="nav-hs">0</span></span>
+  </nav>
+  <canvas id="bgCanvas"></canvas>
+  <div id="wrap">
+    <h1>🐦 Flappy Neon</h1>
+    <div id="stats">
+      <div class="sb"><span class="sl">SCORE</span><span class="sv" id="score">0</span></div>
+      <div class="sb"><span class="sl">BEST</span><span class="sv" id="best">0</span></div>
+    </div>
+    <div id="canvas-wrap">
+      <canvas id="gc" width="320" height="480"></canvas>
+    </div>
+    <p id="hint">Click / Tap / Space to flap</p>
+    <a href="index.html" class="hub-link">🏠 Back to Hub</a>
+  </div>
+  <script src="flappy.js"></script>
+</body>
+</html>

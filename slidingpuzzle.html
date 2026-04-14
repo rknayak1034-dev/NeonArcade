@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>🧩 Sliding Puzzle — NeonArcade</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="game-shell.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#050510;color:#e0e0e0;font-family:'Rajdhani',sans-serif;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:70px 16px 40px}
+#wrap{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:380px;position:relative;z-index:1}
+h1{font-family:'Orbitron',sans-serif;font-size:1.8rem;font-weight:900;color:#66ccff;text-shadow:0 0 20px #66ccff99;letter-spacing:3px}
+#stats{display:flex;gap:16px;background:#0d0d1e;border:1px solid #1e1e3a;border-radius:12px;padding:8px 20px;width:100%;justify-content:space-around}
+.sb{display:flex;flex-direction:column;align-items:center}.sl{font-size:.6rem;letter-spacing:2px;color:#444;font-family:'Orbitron',sans-serif}.sv{font-size:1rem;font-weight:700;color:#66ccff;font-family:'Orbitron',sans-serif}
+#board{display:grid;gap:6px;background:#0d0d1e;border:1px solid #1e1e3a;border-radius:16px;padding:12px;width:100%;max-width:340px;box-shadow:0 0 30px #66ccff11}
+.tile{aspect-ratio:1;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-weight:900;cursor:pointer;transition:all .15s;user-select:none}
+.tile.num{background:#0d1a2e;border:1px solid #66ccff33;color:#66ccff;font-size:1.2rem}
+.tile.num:hover{background:#66ccff22;border-color:#66ccff;transform:scale(1.05)}
+.tile.empty{background:#050510;border:1px dashed #1e1e3a;cursor:default}
+.tile.correct{background:#4cff9122;border-color:#4cff9166;color:#4cff91}
+#msg{font-family:'Orbitron',sans-serif;font-size:.9rem;color:#66ccff;min-height:24px;text-align:center}
+.btn{padding:10px 28px;background:#66ccff;color:#050510;border:none;border-radius:20px;font-family:'Orbitron',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:transform .15s}
+.btn:hover{transform:scale(1.05)}
+#size-bar{display:flex;gap:8px}
+.sbtn{padding:4px 14px;border:1px solid #222;border-radius:16px;background:#0d0d1e;color:#555;cursor:pointer;font-size:.7rem;font-family:'Orbitron',sans-serif;transition:all .2s}
+.sbtn:hover{border-color:#66ccff;color:#66ccff}
+.sbtn.active{background:#66ccff;color:#050510;border-color:#66ccff;font-weight:700}
+</style>
+</head>
+<body>
+<nav class="game-nav"><a href="index.html" class="back-btn">← Hub</a><span class="game-nav-title">🧩 Sliding Puzzle</span><span class="game-nav-hs">🏆 <span id="nav-hs">0</span></span></nav>
+<div id="wrap">
+<h1>🧩 Sliding Puzzle</h1>
+<div id="stats">
+  <div class="sb"><span class="sl">MOVES</span><span class="sv" id="moves">0</span></div>
+  <div class="sb"><span class="sl">TIME</span><span class="sv" id="timer">0s</span></div>
+  <div class="sb"><span class="sl">BEST</span><span class="sv" id="best">—</span></div>
+</div>
+<div id="size-bar">
+  <button class="sbtn active" data-n="3">3×3</button>
+  <button class="sbtn" data-n="4">4×4</button>
+</div>
+<div id="msg">Arrange numbers in order!</div>
+<div id="board"></div>
+<button class="btn" id="newBtn">🔄 Shuffle</button>
+<a href="index.html" class="hub-link">🏠 Back to Hub</a>
+</div>
+<script>
+let n=3,tiles,moves,timerInterval,seconds,running=false;
+const best={3:parseInt(localStorage.getItem('slide3')||'0'),4:parseInt(localStorage.getItem('slide4')||'0')};
+document.getElementById('best').textContent=best[n]||'—';document.getElementById('nav-hs').textContent=best[n]||0;
+
+function newGame(){
+  clearInterval(timerInterval);moves=0;seconds=0;running=false;
+  document.getElementById('moves').textContent=0;document.getElementById('timer').textContent='0s';
+  document.getElementById('msg').textContent='Arrange numbers in order!';
+  const total=n*n;tiles=[...Array(total-1).keys()].map(i=>i+1);tiles.push(0);
+  // Shuffle (ensure solvable)
+  do{tiles.sort(()=>Math.random()-.5);}while(!isSolvable());
+  render();
+}
+
+function isSolvable(){
+  let inv=0;const arr=tiles.filter(v=>v);
+  for(let i=0;i<arr.length;i++)for(let j=i+1;j<arr.length;j++)if(arr[i]>arr[j])inv++;
+  if(n%2===1)return inv%2===0;
+  const blankRow=Math.floor(tiles.indexOf(0)/n);
+  return (inv+blankRow)%2===1;
+}
+
+function render(){
+  const b=document.getElementById('board');b.style.gridTemplateColumns=`repeat(${n},1fr)`;b.innerHTML='';
+  tiles.forEach((v,i)=>{
+    const d=document.createElement('div');
+    const correct=v===i+1||(v===0&&i===n*n-1);
+    d.className='tile '+(v===0?'empty':'num'+(correct?' correct':''));
+    d.textContent=v||'';
+    d.addEventListener('click',()=>move(i));b.appendChild(d);
+  });
+}
+
+function move(i){
+  const blank=tiles.indexOf(0);
+  const r1=Math.floor(i/n),c1=i%n,r2=Math.floor(blank/n),c2=blank%n;
+  if(Math.abs(r1-r2)+Math.abs(c1-c2)!==1)return;
+  [tiles[i],tiles[blank]]=[tiles[blank],tiles[i]];
+  moves++;document.getElementById('moves').textContent=moves;
+  if(!running){running=true;timerInterval=setInterval(()=>{seconds++;document.getElementById('timer').textContent=seconds+'s';},1000);}
+  render();
+  if(tiles.every((v,i)=>v===(i===n*n-1?0:i+1))){
+    clearInterval(timerInterval);running=false;
+    const prev=best[n];
+    if(!prev||moves<prev){best[n]=moves;localStorage.setItem('slide'+n,moves);document.getElementById('best').textContent=moves;document.getElementById('nav-hs').textContent=moves;}
+    document.getElementById('msg').textContent=`🎉 Solved in ${moves} moves & ${seconds}s!`;
+  }
+}
+
+document.querySelectorAll('.sbtn').forEach(b=>{b.addEventListener('click',()=>{document.querySelector('.sbtn.active').classList.remove('active');b.classList.add('active');n=parseInt(b.dataset.n);document.getElementById('best').textContent=best[n]||'—';newGame();});});
+document.getElementById('newBtn').addEventListener('click',newGame);
+newGame();
+</script>
+</body>
+</html>

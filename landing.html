@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🎮 NeonArcade — Welcome</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="landing.css"/>
+</head>
+<body>
+
+  <!-- Animated starfield -->
+  <canvas id="bgCanvas"></canvas>
+
+  <!-- Floating game icons in background -->
+  <div id="bg-icons" aria-hidden="true">
+    <span style="--x:8%;  --y:15%; --s:2.4rem; --d:0s">🐍</span>
+    <span style="--x:88%; --y:10%; --s:2rem;   --d:0.6s">🧱</span>
+    <span style="--x:20%; --y:75%; --s:2.6rem; --d:1.1s">🃏</span>
+    <span style="--x:75%; --y:70%; --s:2.2rem; --d:0.3s">🐦</span>
+    <span style="--x:50%; --y:88%; --s:2rem;   --d:0.9s">🎯</span>
+    <span style="--x:92%; --y:45%; --s:1.8rem; --d:1.5s">🏆</span>
+    <span style="--x:5%;  --y:50%; --s:1.6rem; --d:0.7s">⚡</span>
+    <span style="--x:60%; --y:20%; --s:1.8rem; --d:1.3s">🌟</span>
+  </div>
+
+  <!-- ── NAVBAR ── -->
+  <nav id="navbar">
+    <div class="nav-logo">🎮 <span>NeonArcade</span></div>
+    <div class="nav-right">
+      <button class="nav-btn ghost" id="navLoginBtn">Log In</button>
+      <button class="nav-btn solid" id="navSignupBtn">Sign Up</button>
+    </div>
+  </nav>
+
+  <!-- ── HERO SECTION ── -->
+  <section id="hero">
+    <div id="hero-left">
+      <p class="hero-eyebrow">🎮 FREE ONLINE ARCADE</p>
+      <h1 id="hero-title">
+        <span class="line1">PLAY.</span>
+        <span class="line2">COMPETE.</span>
+        <span class="line3">WIN.</span>
+      </h1>
+      <p id="hero-desc">
+        5 legendary arcade games. Track your scores, build your profile,<br/>
+        and rise through the ranks — all in your browser.
+      </p>
+      <div id="hero-btns">
+        <button class="cta-btn primary" id="heroSignupBtn">🚀 Create Free Account</button>
+        <button class="cta-btn secondary" id="heroGuestBtn">👤 Play as Guest</button>
+      </div>
+      <p id="hero-note">No credit card required · Instant access</p>
+    </div>
+
+    <div id="hero-right">
+      <div id="game-preview-grid">
+        <div class="preview-card" style="--c:#4cff91">
+          <span class="pc-icon">🐍</span>
+          <span class="pc-name">Fantasy Snake</span>
+          <span class="pc-tag">8 Snake Types</span>
+        </div>
+        <div class="preview-card" style="--c:#cc66ff">
+          <span class="pc-icon">🧱</span>
+          <span class="pc-name">Neon Tetris</span>
+          <span class="pc-tag">Classic Puzzle</span>
+        </div>
+        <div class="preview-card" style="--c:#ff6c6c">
+          <span class="pc-icon">🎯</span>
+          <span class="pc-name">Breakout Blitz</span>
+          <span class="pc-tag">Smash Bricks</span>
+        </div>
+        <div class="preview-card" style="--c:#66ccff">
+          <span class="pc-icon">🃏</span>
+          <span class="pc-name">Memory Match</span>
+          <span class="pc-tag">Train Your Mind</span>
+        </div>
+        <div class="preview-card" style="--c:#ffcc00">
+          <span class="pc-icon">🐦</span>
+          <span class="pc-name">Flappy Neon</span>
+          <span class="pc-tag">Endless Reflex</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FEATURES STRIP ── -->
+  <section id="features">
+    <div class="feat">
+      <span class="feat-icon">👤</span>
+      <div><h4>Personal Profile</h4><p>Save scores & track progress across all games</p></div>
+    </div>
+    <div class="feat-divider"></div>
+    <div class="feat">
+      <span class="feat-icon">🏆</span>
+      <div><h4>Leaderboard</h4><p>See your rank and beat your personal bests</p></div>
+    </div>
+    <div class="feat-divider"></div>
+    <div class="feat">
+      <span class="feat-icon">📱</span>
+      <div><h4>Mobile Ready</h4><p>Touch controls built in — play anywhere</p></div>
+    </div>
+    <div class="feat-divider"></div>
+    <div class="feat">
+      <span class="feat-icon">⚡</span>
+      <div><h4>Instant Play</h4><p>No downloads, no installs, just open and play</p></div>
+    </div>
+  </section>
+
+  <!-- ── STATS STRIP ── -->
+  <section id="stats-strip">
+    <div class="stat-item"><span class="stat-num">5</span><span class="stat-lbl">Games</span></div>
+    <div class="stat-item"><span class="stat-num">∞</span><span class="stat-lbl">Fun</span></div>
+    <div class="stat-item"><span class="stat-num">0</span><span class="stat-lbl">Cost</span></div>
+    <div class="stat-item"><span class="stat-num">100%</span><span class="stat-lbl">Browser</span></div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer id="footer">
+    <div class="footer-logo">&#x1F3AE; NeonArcade</div>
+    <div id="footer-owner">
+      <span id="footer-owner-label">Founded &amp; Built by</span>
+      <span id="footer-owner-name">&#x1F451; Lochan Kumar Nayak</span>
+    </div>
+    <p class="footer-copy">&copy; 2025 NeonArcade &middot; All rights reserved &middot; Built with &#x2764;&#xFE0F; using HTML5 &middot; CSS3 &middot; Vanilla JS</p>
+    <div class="footer-links">
+      <button class="footer-auth-btn" id="footerLoginBtn">Log In</button>
+      <button class="footer-auth-btn solid" id="footerSignupBtn">Sign Up Free</button>
+    </div>
+  </footer>
+
+  <!-- ══════════════════════════════════════════
+       AUTH MODAL
+  ══════════════════════════════════════════ -->
+  <div id="modal-backdrop" class="hidden">
+    <div id="auth-modal">
+
+      <!-- Close -->
+      <button id="modal-close" aria-label="Close">✕</button>
+
+      <!-- ── PANEL: LOGIN ── -->
+      <div id="panel-login" class="auth-panel active">
+        <div class="modal-logo">🎮</div>
+        <h2 class="modal-title">Welcome Back!</h2>
+        <p class="modal-sub">Log in to your NeonArcade account</p>
+
+        <div class="input-group">
+          <label>Email Address</label>
+          <div class="input-wrap">
+            <span class="input-icon">✉️</span>
+            <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email"/>
+          </div>
+          <span class="field-error" id="login-email-err"></span>
+        </div>
+
+        <div class="input-group">
+          <label>Password</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="login-pass" placeholder="Your password" autocomplete="current-password"/>
+            <button class="toggle-pass" data-target="login-pass">👁</button>
+          </div>
+          <span class="field-error" id="login-pass-err"></span>
+        </div>
+
+        <div id="login-global-err" class="global-error hidden"></div>
+
+        <button class="auth-btn primary" id="loginSubmitBtn">▶ LOG IN</button>
+
+        <button class="text-link" id="toForgotBtn">Forgot your password?</button>
+
+        <div class="divider"><span>or</span></div>
+
+        <button class="auth-btn guest" id="loginGuestBtn">👤 Continue as Guest</button>
+
+        <p class="switch-text">Don't have an account? <button class="text-link inline" id="toSignupFromLogin">Sign Up Free</button></p>
+      </div>
+
+      <!-- ── PANEL: SIGN UP ── -->
+      <div id="panel-signup" class="auth-panel">
+        <div class="modal-logo">🎮</div>
+        <h2 class="modal-title">Create Account</h2>
+        <p class="modal-sub">Join NeonArcade — it's completely free!</p>
+
+        <div class="input-group">
+          <label>Display Name</label>
+          <div class="input-wrap">
+            <span class="input-icon">🎮</span>
+            <input type="text" id="signup-name" placeholder="Your gamer tag" autocomplete="nickname" maxlength="20"/>
+          </div>
+          <span class="field-error" id="signup-name-err"></span>
+        </div>
+
+        <div class="input-group">
+          <label>Email Address</label>
+          <div class="input-wrap">
+            <span class="input-icon">✉️</span>
+            <input type="email" id="signup-email" placeholder="you@example.com" autocomplete="email"/>
+          </div>
+          <span class="field-error" id="signup-email-err"></span>
+        </div>
+
+        <div class="input-group">
+          <label>Password <span class="label-hint">(min 6 characters)</span></label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="signup-pass" placeholder="Create a password" autocomplete="new-password"/>
+            <button class="toggle-pass" data-target="signup-pass">👁</button>
+          </div>
+          <div id="pass-strength-bar"><div id="pass-strength-fill"></div></div>
+          <span class="field-error" id="signup-pass-err"></span>
+        </div>
+
+        <div class="input-group">
+          <label>Confirm Password</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="signup-confirm" placeholder="Repeat your password" autocomplete="new-password"/>
+            <button class="toggle-pass" data-target="signup-confirm">👁</button>
+          </div>
+          <span class="field-error" id="signup-confirm-err"></span>
+        </div>
+
+        <div id="signup-global-err" class="global-error hidden"></div>
+
+        <button class="auth-btn primary" id="signupSubmitBtn">🚀 CREATE ACCOUNT</button>
+
+        <div class="divider"><span>or</span></div>
+
+        <button class="auth-btn guest" id="signupGuestBtn">👤 Continue as Guest</button>
+
+        <p class="switch-text">Already have an account? <button class="text-link inline" id="toLoginFromSignup">Log In</button></p>
+      </div>
+
+      <!-- ── PANEL: FORGOT PASSWORD ── -->
+      <div id="panel-forgot" class="auth-panel">
+        <div class="modal-logo">🔑</div>
+        <h2 class="modal-title">Reset Password</h2>
+        <p class="modal-sub">Enter your email and we'll help you reset your password</p>
+
+        <div class="input-group" id="forgot-step1">
+          <label>Email Address</label>
+          <div class="input-wrap">
+            <span class="input-icon">✉️</span>
+            <input type="email" id="forgot-email" placeholder="you@example.com"/>
+          </div>
+          <span class="field-error" id="forgot-email-err"></span>
+          <div id="forgot-global-err" class="global-error hidden"></div>
+          <button class="auth-btn primary" id="forgotSendBtn" style="margin-top:16px">🔍 FIND MY ACCOUNT</button>
+        </div>
+
+        <!-- Step 2: set new password (shown after email verified) -->
+        <div id="forgot-step2" class="hidden">
+          <div class="success-badge">✅ Account found for <strong id="found-email"></strong></div>
+          <div class="input-group" style="margin-top:16px">
+            <label>New Password</label>
+            <div class="input-wrap">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="new-pass" placeholder="New password (min 6 chars)"/>
+              <button class="toggle-pass" data-target="new-pass">👁</button>
+            </div>
+            <span class="field-error" id="new-pass-err"></span>
+          </div>
+          <div class="input-group">
+            <label>Confirm New Password</label>
+            <div class="input-wrap">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="new-pass-confirm" placeholder="Repeat new password"/>
+              <button class="toggle-pass" data-target="new-pass-confirm">👁</button>
+            </div>
+            <span class="field-error" id="new-pass-confirm-err"></span>
+          </div>
+          <button class="auth-btn primary" id="resetPassBtn">🔐 RESET PASSWORD</button>
+        </div>
+
+        <!-- Step 3: success -->
+        <div id="forgot-step3" class="hidden">
+          <div class="success-screen">
+            <div class="success-icon">🎉</div>
+            <h3>Password Reset!</h3>
+            <p>Your password has been updated successfully.</p>
+            <button class="auth-btn primary" id="goLoginAfterReset">▶ LOG IN NOW</button>
+          </div>
+        </div>
+
+        <button class="text-link back-link" id="backToLoginBtn">← Back to Login</button>
+      </div>
+
+      <!-- ── PANEL: SUCCESS (after signup) ── -->
+      <div id="panel-success" class="auth-panel">
+        <div class="success-screen">
+          <div class="success-icon" id="success-icon">🎉</div>
+          <h2 id="success-title">Account Created!</h2>
+          <p id="success-msg">Welcome to NeonArcade!</p>
+          <div id="success-avatar"></div>
+          <button class="auth-btn primary" id="goPlayBtn">🎮 START PLAYING</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div id="toast" class="hidden"></div>
+
+  <script src="landing.js"></script>
+</body>
+</html>

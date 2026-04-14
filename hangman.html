@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>🔤 Hangman — NeonArcade</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="game-shell.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#050510;color:#e0e0e0;font-family:'Rajdhani',sans-serif;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:70px 16px 40px}
+#wrap{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:420px;position:relative;z-index:1}
+h1{font-family:'Orbitron',sans-serif;font-size:1.8rem;font-weight:900;color:#cc66ff;text-shadow:0 0 20px #cc66ff99;letter-spacing:3px}
+#stats{display:flex;gap:16px;background:#0d0d1e;border:1px solid #1e1e3a;border-radius:12px;padding:8px 20px;width:100%;justify-content:space-around}
+.sb{display:flex;flex-direction:column;align-items:center}.sl{font-size:.6rem;letter-spacing:2px;color:#444;font-family:'Orbitron',sans-serif}.sv{font-size:1rem;font-weight:700;color:#cc66ff;font-family:'Orbitron',sans-serif}
+#figure{font-size:4rem;text-align:center;min-height:80px;line-height:1}
+#lives-display{display:flex;gap:4px;justify-content:center;font-size:1.2rem}
+#hint-text{font-size:.8rem;color:#555;font-family:'Orbitron',sans-serif;text-align:center;letter-spacing:1px}
+#word-display{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.letter-slot{width:32px;height:40px;border-bottom:2px solid #4cff9166;display:flex;align-items:flex-end;justify-content:center;font-family:'Orbitron',sans-serif;font-size:1.2rem;font-weight:700;color:#4cff91;padding-bottom:4px}
+#wrong-letters{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;min-height:28px}
+.wrong-l{font-family:'Orbitron',sans-serif;font-size:.85rem;color:#ff6c6c;background:#ff6c6c11;border:1px solid #ff6c6c44;border-radius:6px;padding:2px 8px}
+#keyboard{display:flex;flex-direction:column;gap:5px;align-items:center}
+.kb-row{display:flex;gap:4px}
+.key{width:32px;height:36px;background:#0d0d1e;border:1px solid #1e1e3a;border-radius:6px;color:#ccc;font-family:'Orbitron',sans-serif;font-size:.65rem;font-weight:700;cursor:pointer;transition:all .15s}
+.key:hover:not(:disabled){border-color:#cc66ff;color:#cc66ff}
+.key:disabled{opacity:.3;cursor:not-allowed}
+.key.hit{background:#4cff9122;border-color:#4cff91;color:#4cff91}
+.key.miss{background:#ff6c6c11;border-color:#ff6c6c33;color:#ff6c6c33}
+#msg{font-family:'Orbitron',sans-serif;font-size:.9rem;min-height:24px;text-align:center}
+.btn{padding:10px 28px;background:#cc66ff;color:#050510;border:none;border-radius:20px;font-family:'Orbitron',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:transform .15s}
+.btn:hover{transform:scale(1.05)}
+</style>
+</head>
+<body>
+<nav class="game-nav"><a href="index.html" class="back-btn">← Hub</a><span class="game-nav-title">🔤 Hangman</span><span class="game-nav-hs">🏆 <span id="nav-hs">0</span></span></nav>
+<div id="wrap">
+<h1>🔤 Hangman</h1>
+<div id="stats">
+  <div class="sb"><span class="sl">WINS</span><span class="sv" id="wins">0</span></div>
+  <div class="sb"><span class="sl">STREAK</span><span class="sv" id="streak">0</span></div>
+  <div class="sb"><span class="sl">BEST</span><span class="sv" id="best">0</span></div>
+</div>
+<div id="figure">🙂</div>
+<div id="lives-display"></div>
+<div id="hint-text"></div>
+<div id="word-display"></div>
+<div id="wrong-letters"></div>
+<div id="keyboard"></div>
+<div id="msg"></div>
+<button class="btn" id="newBtn">🔄 New Word</button>
+<a href="index.html" class="hub-link">🏠 Back to Hub</a>
+</div>
+<script>
+const WORDS=[
+  {w:'JAVASCRIPT',h:'Programming Language'},
+  {w:'PYTHON',h:'Programming Language'},
+  {w:'KEYBOARD',h:'Computer Hardware'},
+  {w:'ALGORITHM',h:'Computer Science'},
+  {w:'DATABASE',h:'Computer Science'},
+  {w:'INTERNET',h:'Technology'},
+  {w:'BROWSER',h:'Technology'},
+  {w:'NETWORK',h:'Technology'},
+  {w:'ELEPHANT',h:'Animal'},
+  {w:'GIRAFFE',h:'Animal'},
+  {w:'PENGUIN',h:'Animal'},
+  {w:'DOLPHIN',h:'Animal'},
+  {w:'VOLCANO',h:'Geography'},
+  {w:'PYRAMID',h:'Architecture'},
+  {w:'GALAXY',h:'Astronomy'},
+  {w:'THUNDER',h:'Weather'},
+  {w:'DIAMOND',h:'Gemstone'},
+  {w:'RAINBOW',h:'Weather'},
+  {w:'COMPASS',h:'Navigation Tool'},
+  {w:'LANTERN',h:'Light Source'},
+  {w:'BLANKET',h:'Household Item'},
+  {w:'CAPTAIN',h:'Title/Rank'},
+  {w:'MYSTERY',h:'Genre'},
+  {w:'FANTASY',h:'Genre'},
+  {w:'JOURNEY',h:'Travel'},
+  {w:'FREEDOM',h:'Concept'},
+  {w:'COURAGE',h:'Virtue'},
+  {w:'HARMONY',h:'Music/Concept'},
+  {w:'BALANCE',h:'Concept'},
+  {w:'VICTORY',h:'Achievement'}
+];
+const STAGES=['🙂','😐','😟','😨','😰','😱','💀'];
+let word,hint,guessed,wrong,wins=parseInt(localStorage.getItem('hangWins')||'0'),streak=parseInt(localStorage.getItem('hangStreak')||'0'),best=parseInt(localStorage.getItem('hangHS')||'0');
+document.getElementById('wins').textContent=wins;document.getElementById('streak').textContent=streak;document.getElementById('best').textContent=best;document.getElementById('nav-hs').textContent=best;
+
+function newGame(){
+  const pick=WORDS[Math.floor(Math.random()*WORDS.length)];
+  word=pick.w;hint=pick.h;guessed=new Set();wrong=[];
+  document.getElementById('msg').textContent='';
+  document.getElementById('figure').textContent=STAGES[0];
+  document.getElementById('hint-text').textContent='Hint: '+hint;
+  renderWord();renderLives();renderWrong();buildKeyboard();
+}
+
+function renderWord(){
+  const d=document.getElementById('word-display');d.innerHTML='';
+  [...word].forEach(l=>{
+    const s=document.createElement('div');s.className='letter-slot';
+    s.textContent=guessed.has(l)?l:'';d.appendChild(s);
+  });
+}
+
+function renderLives(){
+  document.getElementById('lives-display').textContent='❤️'.repeat(6-wrong.length)+'🖤'.repeat(wrong.length);
+}
+
+function renderWrong(){
+  const d=document.getElementById('wrong-letters');d.innerHTML='';
+  wrong.forEach(l=>{const s=document.createElement('span');s.className='wrong-l';s.textContent=l;d.appendChild(s);});
+}
+
+function buildKeyboard(){
+  const kb=document.getElementById('keyboard');kb.innerHTML='';
+  [['Q','W','E','R','T','Y','U','I','O','P'],['A','S','D','F','G','H','J','K','L'],['Z','X','C','V','B','N','M']].forEach(row=>{
+    const r=document.createElement('div');r.className='kb-row';
+    row.forEach(k=>{
+      const b=document.createElement('button');b.className='key';b.textContent=k;b.dataset.k=k;
+      b.addEventListener('click',()=>guess(k));r.appendChild(b);
+    });
+    kb.appendChild(r);
+  });
+}
+
+function guess(l){
+  if(guessed.has(l)||wrong.includes(l))return;
+  if(word.includes(l)){
+    guessed.add(l);renderWord();
+    if([...word].every(c=>guessed.has(c))){
+      wins++;streak++;if(streak>best){best=streak;localStorage.setItem('hangHS',best);document.getElementById('best').textContent=best;document.getElementById('nav-hs').textContent=best;}
+      localStorage.setItem('hangWins',wins);localStorage.setItem('hangStreak',streak);
+      document.getElementById('wins').textContent=wins;document.getElementById('streak').textContent=streak;
+      document.getElementById('msg').textContent='🎉 You Win!';
+      document.getElementById('figure').textContent='🎉';
+      disableKeys();
+    }
+    document.querySelector(`.key[data-k="${l}"]`).classList.add('hit');
+  }else{
+    wrong.push(l);renderLives();renderWrong();
+    document.getElementById('figure').textContent=STAGES[wrong.length];
+    document.querySelector(`.key[data-k="${l}"]`).classList.add('miss');
+    if(wrong.length>=6){
+      streak=0;localStorage.setItem('hangStreak',0);document.getElementById('streak').textContent=0;
+      document.getElementById('msg').textContent=`💀 The word was ${word}`;
+      disableKeys();
+    }
+  }
+}
+
+function disableKeys(){document.querySelectorAll('.key').forEach(b=>b.disabled=true);}
+
+document.addEventListener('keydown',e=>{if(/^[A-Za-z]$/.test(e.key))guess(e.key.toUpperCase());});
+document.getElementById('newBtn').addEventListener('click',newGame);
+newGame();
+</script>
+</body>
+</html>

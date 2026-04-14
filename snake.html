@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🐍 Fantasy Snake — NeonArcade</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="game-shell.css"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <nav class="game-nav">
+    <a href="index.html" class="back-btn">← Hub</a>
+    <span class="game-nav-title">🐍 Fantasy Snake</span>
+    <span class="game-nav-hs">🏆 <span id="nav-hs">0</span></span>
+  </nav>
+
+  <canvas id="bgCanvas"></canvas>
+
+  <div id="game-container">
+    <h1 id="game-title">🐍 Fantasy Snake</h1>
+    <div id="stats-bar">
+      <div class="stat-block"><span class="stat-label">SCORE</span><span class="stat-value" id="score">0</span></div>
+      <div class="stat-block"><span class="stat-label">LEVEL</span><span class="stat-value" id="level">1</span></div>
+      <div class="stat-block"><span class="stat-label">BEST</span><span class="stat-value" id="high-score">0</span></div>
+      <div class="stat-block"><span class="stat-label">LIVES</span><span class="stat-value" id="lives">❤️❤️❤️</span></div>
+    </div>
+    <div id="hud-row">
+      <div id="snake-badge">🐍 <span id="snake-badge-name">Classic</span></div>
+      <div id="combo-display" class="hidden">🔥 <span id="combo-count">1</span>x COMBO!</div>
+      <div id="powerup-display" class="hidden">
+        <span id="powerup-icon"></span><span id="powerup-name"></span>
+        <div id="powerup-bar-wrap"><div id="powerup-bar"></div></div>
+      </div>
+    </div>
+    <div id="snake-type-bar">
+      <div class="snake-type-btn active" data-type="classic" data-unlock="0"><span class="st-icon">🐍</span><span class="st-name">Classic</span><span class="st-unlock">Lv.1</span></div>
+      <div class="snake-type-btn" data-type="inferno" data-unlock="2"><span class="st-icon">🔥</span><span class="st-name">Inferno</span><span class="st-unlock">Lv.2</span></div>
+      <div class="snake-type-btn" data-type="frost" data-unlock="3"><span class="st-icon">❄️</span><span class="st-name">Frost</span><span class="st-unlock">Lv.3</span></div>
+      <div class="snake-type-btn" data-type="thunder" data-unlock="4"><span class="st-icon">⚡</span><span class="st-name">Thunder</span><span class="st-unlock">Lv.4</span></div>
+      <div class="snake-type-btn" data-type="phantom" data-unlock="5"><span class="st-icon">👻</span><span class="st-name">Phantom</span><span class="st-unlock">Lv.5</span></div>
+      <div class="snake-type-btn" data-type="cosmic" data-unlock="6"><span class="st-icon">🌟</span><span class="st-name">Cosmic</span><span class="st-unlock">Lv.6</span></div>
+      <div class="snake-type-btn" data-type="shadow" data-unlock="7"><span class="st-icon">💀</span><span class="st-name">Shadow</span><span class="st-unlock">Lv.7</span></div>
+      <div class="snake-type-btn" data-type="dragon" data-unlock="8"><span class="st-icon">🐉</span><span class="st-name">Dragon</span><span class="st-unlock">Lv.8</span></div>
+    </div>
+    <div id="difficulty-bar">
+      <button class="diff-btn active" data-speed="150">Easy</button>
+      <button class="diff-btn" data-speed="100">Medium</button>
+      <button class="diff-btn" data-speed="60">Hard</button>
+    </div>
+    <div id="canvas-wrap">
+      <canvas id="gameCanvas" width="400" height="400"></canvas>
+      <canvas id="particleCanvas" width="400" height="400"></canvas>
+      <div id="toast" class="hidden"></div>
+    </div>
+    <div id="controls"><button id="pauseBtn">⏸ Pause</button></div>
+    <div id="dpad">
+      <div id="dpad-grid">
+        <div></div><button class="dpad-btn" data-dir="up">▲</button><div></div>
+        <button class="dpad-btn" data-dir="left">◀</button><div class="dpad-center">●</div><button class="dpad-btn" data-dir="right">▶</button>
+        <div></div><button class="dpad-btn" data-dir="down">▼</button><div></div>
+      </div>
+    </div>
+    <div id="start-overlay">
+      <div id="start-box">
+        <div id="start-snake-icon">🐍</div>
+        <h2 id="start-title">Fantasy Snake</h2>
+        <p id="start-subtitle">Eat · Grow · Evolve</p>
+        <div id="start-hs">🏆 Best: <span id="start-hs-val">0</span></div>
+        <div id="feature-pills">
+          <span class="pill">🐉 8 Snakes</span><span class="pill">⚡ Levels</span><span class="pill">🔥 Combos</span><span class="pill">❤️ Lives</span>
+        </div>
+        <p id="start-hints">Arrow Keys or D-Pad</p>
+        <button id="startBtn">▶ START GAME</button>
+      </div>
+    </div>
+    <div id="overlay" class="hidden">
+      <div id="overlay-box">
+        <h2 id="overlay-title">💀 Game Over</h2>
+        <p id="overlay-score"></p>
+        <div id="overlay-stats"></div>
+        <div id="overlay-badges"></div>
+        <button id="restartBtn">▶ Play Again</button>
+        <br/><a href="index.html" class="hub-link">🏠 Back to Hub</a>
+      </div>
+    </div>
+    <div id="levelup-overlay" class="hidden">
+      <div id="levelup-box">
+        <div id="levelup-icon"></div>
+        <h2 id="levelup-title">LEVEL UP!</h2>
+        <p id="levelup-snake"></p>
+        <p id="levelup-ability"></p>
+      </div>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

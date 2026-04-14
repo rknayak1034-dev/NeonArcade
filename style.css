@@ -1,0 +1,341 @@
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #050510;
+  color: #e0e0e0;
+  font-family: 'Rajdhani', 'Segoe UI', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 16px 8px 40px;
+  overflow-x: hidden;
+}
+
+/* ── Starfield BG ── */
+#bgCanvas {
+  position: fixed; inset: 0;
+  width: 100%; height: 100%;
+  z-index: 0; pointer-events: none;
+}
+
+/* ── Container ── */
+#game-container {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 10px;
+  position: relative; z-index: 1;
+  width: 100%; max-width: 440px;
+}
+
+/* ── Title ── */
+#game-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.8rem; font-weight: 900;
+  letter-spacing: 3px; color: #4cff91;
+  text-shadow: 0 0 20px #4cff9199, 0 0 40px #4cff9144;
+  animation: titlePulse 3s ease-in-out infinite;
+}
+@keyframes titlePulse {
+  0%,100% { text-shadow: 0 0 20px #4cff9199, 0 0 40px #4cff9144; }
+  50%      { text-shadow: 0 0 30px #4cff91cc, 0 0 60px #4cff9188; }
+}
+
+/* ── Stats Bar ── */
+#stats-bar {
+  display: flex; gap: 20px;
+  background: #0d0d1e; border: 1px solid #1e1e3a;
+  border-radius: 12px; padding: 8px 20px;
+  width: 100%; justify-content: space-around;
+}
+.stat-block { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.stat-label { font-size: 0.6rem; letter-spacing: 2px; color: #444; font-family: 'Orbitron', sans-serif; }
+.stat-value { font-size: 1rem; font-weight: 700; color: #4cff91; font-family: 'Orbitron', sans-serif; }
+#lives { font-size: 0.8rem; }
+
+/* ── HUD Row ── */
+#hud-row {
+  display: flex; gap: 10px; align-items: center;
+  min-height: 28px; width: 100%; justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Snake Badge */
+#snake-badge {
+  display: flex; align-items: center; gap: 5px;
+  background: #0d0d1e; border: 1px solid #2a2a4a;
+  border-radius: 20px; padding: 3px 12px;
+  font-family: 'Orbitron', sans-serif; font-size: 0.75rem;
+  color: #4cff91; font-weight: 700;
+  transition: all 0.3s;
+}
+
+#combo-display {
+  font-family: 'Orbitron', sans-serif; font-size: 0.85rem;
+  font-weight: 700; color: #ffcc00;
+  text-shadow: 0 0 10px #ffcc0099;
+  animation: comboPop 0.25s ease;
+}
+@keyframes comboPop {
+  0%   { transform: scale(1.6); opacity: 0; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+#powerup-display {
+  display: flex; align-items: center; gap: 6px;
+  background: #0d0d1e; border: 1px solid #333;
+  border-radius: 20px; padding: 3px 10px; font-size: 0.8rem;
+}
+#powerup-name { color: #fff; font-weight: 600; }
+#powerup-bar-wrap { width: 50px; height: 4px; background: #222; border-radius: 3px; overflow: hidden; }
+#powerup-bar { height: 100%; background: #4cff91; border-radius: 3px; transition: width 0.1s linear; }
+
+/* ── Snake Type Selector ── */
+#snake-type-bar {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  justify-content: center; width: 100%;
+  padding: 6px 0;
+}
+
+.snake-type-btn {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 2px; padding: 6px 10px;
+  background: #0d0d1e; border: 1px solid #1e1e3a;
+  border-radius: 12px; cursor: pointer;
+  transition: all 0.2s; position: relative;
+  min-width: 58px; user-select: none;
+}
+.snake-type-btn:hover:not(.locked) { border-color: #4cff91; transform: translateY(-2px); }
+.snake-type-btn.active {
+  background: #4cff9115; border-color: #4cff91;
+  box-shadow: 0 0 14px #4cff9133;
+}
+.snake-type-btn.locked {
+  opacity: 0.35; cursor: not-allowed; filter: grayscale(0.6);
+}
+.st-icon  { font-size: 1.3rem; line-height: 1; }
+.st-name  { font-size: 0.62rem; font-weight: 700; color: #888; font-family: 'Orbitron', sans-serif; }
+.st-unlock {
+  font-size: 0.55rem; color: #555;
+  font-family: 'Orbitron', sans-serif;
+}
+.snake-type-btn.active .st-name  { color: #4cff91; }
+.snake-type-btn.active .st-unlock { color: #4cff9188; }
+
+/* Lock icon overlay */
+.snake-type-btn.locked::after {
+  content: '🔒';
+  position: absolute; top: 3px; right: 4px;
+  font-size: 0.6rem;
+}
+
+/* ── Difficulty ── */
+#difficulty-bar { display: flex; gap: 6px; }
+.diff-btn {
+  padding: 4px 14px; border: 1px solid #222;
+  border-radius: 16px; background: #0d0d1e; color: #555;
+  cursor: pointer; font-size: 0.7rem;
+  font-family: 'Orbitron', sans-serif; transition: all 0.2s;
+}
+.diff-btn:hover  { border-color: #4cff91; color: #4cff91; }
+.diff-btn.active { background: #4cff91; color: #050510; border-color: #4cff91; font-weight: 700; }
+
+/* ── Canvas Wrap ── */
+#canvas-wrap {
+  position: relative; border-radius: 10px;
+  overflow: hidden; flex-shrink: 0;
+  box-shadow: 0 0 40px #4cff9122, 0 0 80px #4cff9108;
+}
+#gameCanvas, #particleCanvas { display: block; width: 400px; height: 400px; }
+#particleCanvas { position: absolute; top: 0; left: 0; pointer-events: none; }
+
+/* ── Toast ── */
+#toast {
+  position: absolute; top: 12px; left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a2eee; border: 1px solid #4cff91;
+  border-radius: 20px; padding: 6px 18px;
+  font-family: 'Orbitron', sans-serif; font-size: 0.8rem;
+  color: #4cff91; white-space: nowrap;
+  z-index: 15; pointer-events: none;
+  animation: toastIn 0.3s ease;
+}
+#toast.hidden { display: none; }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ── Canvas level-up flash ── */
+#canvas-wrap.levelup { animation: levelFlash 0.7s ease; }
+@keyframes levelFlash {
+  0%  { box-shadow: 0 0 40px #4cff9122; }
+  40% { box-shadow: 0 0 80px #ffcc00cc, 0 0 140px #ffcc0055; }
+  100%{ box-shadow: 0 0 40px #4cff9122; }
+}
+
+/* ── Pause Button ── */
+#controls { display: flex; gap: 10px; }
+#pauseBtn {
+  padding: 6px 20px; background: #0d0d1e;
+  border: 1px solid #222; border-radius: 16px;
+  color: #777; cursor: pointer; font-size: 0.8rem;
+  font-family: 'Orbitron', sans-serif; transition: all 0.2s;
+}
+#pauseBtn:hover { border-color: #4cff91; color: #4cff91; }
+
+/* ── D-Pad ── */
+#dpad { margin-top: 4px; }
+#dpad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 52px);
+  grid-template-rows: repeat(3, 52px);
+  gap: 4px;
+}
+.dpad-btn {
+  background: #0d0d1e; border: 1px solid #2a2a3e;
+  border-radius: 10px; color: #4cff91; font-size: 1.1rem;
+  cursor: pointer; transition: all 0.1s;
+  display: flex; align-items: center; justify-content: center;
+  user-select: none; -webkit-tap-highlight-color: transparent;
+}
+.dpad-btn:active { background: #4cff9133; border-color: #4cff91; transform: scale(0.9); }
+.dpad-center { display: flex; align-items: center; justify-content: center; color: #1e1e3a; font-size: 1.2rem; }
+
+/* ── Start Screen ── */
+#start-overlay {
+  position: absolute; inset: 0;
+  display: flex; justify-content: center; align-items: center;
+  background: #050510bb; backdrop-filter: blur(8px);
+  border-radius: 10px; z-index: 30;
+}
+#start-overlay.hidden { display: none; }
+#start-box {
+  background: #0d0d1e; border: 1px solid #4cff91;
+  border-radius: 20px; padding: 28px 32px;
+  text-align: center; box-shadow: 0 0 60px #4cff9133;
+  animation: overlayIn 0.4s ease;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  max-width: 310px; width: 90%;
+}
+#start-snake-icon { font-size: 3rem; animation: snakeBounce 1.4s ease-in-out infinite; }
+@keyframes snakeBounce {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+#start-title {
+  font-family: 'Orbitron', sans-serif; font-size: 1.5rem;
+  font-weight: 900; color: #4cff91; letter-spacing: 3px;
+  text-shadow: 0 0 20px #4cff9199;
+}
+#start-subtitle { font-size: 0.82rem; color: #444; letter-spacing: 3px; text-transform: uppercase; }
+#start-hs { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; color: #ffcc00; }
+#feature-pills { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.pill {
+  padding: 3px 10px; border-radius: 12px; font-size: 0.7rem;
+  font-weight: 600; background: #1a1a2e; border: 1px solid #2a2a4a; color: #888;
+}
+#start-hints { font-size: 0.72rem; color: #333; }
+#startBtn {
+  margin-top: 4px; padding: 12px 40px;
+  background: #4cff91; color: #050510; border: none;
+  border-radius: 28px; font-size: 1rem; font-weight: 900;
+  font-family: 'Orbitron', sans-serif; letter-spacing: 2px;
+  cursor: pointer; box-shadow: 0 0 24px #4cff9166;
+  transition: transform 0.15s, box-shadow 0.15s;
+  animation: startPulse 1.8s ease-in-out infinite;
+}
+@keyframes startPulse {
+  0%,100% { box-shadow: 0 0 24px #4cff9166; }
+  50%      { box-shadow: 0 0 44px #4cff91bb; }
+}
+#startBtn:hover { transform: scale(1.07); box-shadow: 0 0 50px #4cff91cc; animation: none; }
+
+/* ── Game Over Overlay ── */
+#overlay {
+  position: absolute; inset: 0;
+  display: flex; justify-content: center; align-items: center;
+  background: #05051099; backdrop-filter: blur(6px);
+  border-radius: 10px; z-index: 30;
+}
+#overlay.hidden { display: none; }
+#overlay-box {
+  background: #0d0d1e; border: 1px solid #4cff91;
+  border-radius: 16px; padding: 26px 32px;
+  text-align: center; box-shadow: 0 0 60px #4cff9133;
+  animation: overlayIn 0.3s ease; max-width: 310px; width: 90%;
+}
+@keyframes overlayIn {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+#overlay-title { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: #4cff91; margin-bottom: 6px; }
+#overlay-score { font-size: 0.88rem; color: #555; margin-bottom: 10px; }
+#overlay-stats {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; margin-bottom: 12px;
+}
+.stat-card {
+  background: #111122; border: 1px solid #1e1e3a;
+  border-radius: 10px; padding: 8px; text-align: center;
+}
+.stat-card .sc-label { font-size: 0.58rem; letter-spacing: 1px; color: #444; font-family: 'Orbitron', sans-serif; }
+.stat-card .sc-val   { font-size: 0.95rem; font-weight: 700; color: #4cff91; font-family: 'Orbitron', sans-serif; }
+#overlay-badges { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; }
+.badge {
+  padding: 3px 10px; border-radius: 12px; font-size: 0.7rem;
+  font-weight: 600; background: #1a1a2e; border: 1px solid #333; color: #aaa;
+}
+.badge.gold   { border-color: #ffcc00; color: #ffcc00; }
+.badge.purple { border-color: #cc66ff; color: #cc66ff; }
+.badge.red    { border-color: #ff6666; color: #ff6666; }
+.badge.cyan   { border-color: #66ffff; color: #66ffff; }
+#restartBtn {
+  padding: 10px 32px; background: #4cff91; color: #050510;
+  border: none; border-radius: 24px; font-size: 0.9rem;
+  font-weight: 700; font-family: 'Orbitron', sans-serif;
+  cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+}
+#restartBtn:hover { transform: scale(1.06); box-shadow: 0 0 20px #4cff9188; }
+
+/* ── Level Up Overlay ── */
+#levelup-overlay {
+  position: absolute; inset: 0;
+  display: flex; justify-content: center; align-items: center;
+  background: #05051088; backdrop-filter: blur(4px);
+  border-radius: 10px; z-index: 25;
+  pointer-events: none;
+}
+#levelup-overlay.hidden { display: none; }
+#levelup-box {
+  background: #0d0d1e; border: 2px solid #ffcc00;
+  border-radius: 20px; padding: 28px 40px;
+  text-align: center; box-shadow: 0 0 60px #ffcc0055;
+  animation: levelUpPop 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+@keyframes levelUpPop {
+  from { transform: scale(0.5); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+#levelup-icon { font-size: 3rem; animation: spinOnce 0.6s ease; }
+@keyframes spinOnce {
+  from { transform: rotate(-180deg) scale(0); }
+  to   { transform: rotate(0deg) scale(1); }
+}
+#levelup-title {
+  font-family: 'Orbitron', sans-serif; font-size: 1.6rem;
+  font-weight: 900; color: #ffcc00;
+  text-shadow: 0 0 20px #ffcc0099;
+}
+#levelup-snake { font-size: 1rem; color: #4cff91; font-weight: 700; }
+#levelup-ability { font-size: 0.8rem; color: #888; max-width: 220px; }
+
+.hidden { display: none !important; }
+
+/* ── Responsive ── */
+@media (max-width: 420px) {
+  #gameCanvas, #particleCanvas { width: 320px !important; height: 320px !important; }
+  #canvas-wrap { width: 320px; }
+  .snake-type-btn { min-width: 50px; padding: 5px 7px; }
+  .st-icon { font-size: 1.1rem; }
+}

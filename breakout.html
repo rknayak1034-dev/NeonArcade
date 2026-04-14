@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🎯 Breakout Blitz — NeonArcade</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="game-shell.css"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:#050510;color:#e0e0e0;font-family:'Rajdhani','Segoe UI',sans-serif;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:70px 16px 40px;overflow-x:hidden}
+    #bgCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+    #wrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:420px}
+    h1{font-family:'Orbitron',sans-serif;font-size:1.6rem;font-weight:900;color:#ff6c6c;text-shadow:0 0 20px #ff6c6c99;letter-spacing:3px}
+    #stats{display:flex;gap:20px;background:#0d0d1e;border:1px solid #1e1e3a;border-radius:12px;padding:8px 20px;width:100%;justify-content:space-around}
+    .sb{display:flex;flex-direction:column;align-items:center;gap:2px}
+    .sl{font-size:.6rem;letter-spacing:2px;color:#444;font-family:'Orbitron',sans-serif}
+    .sv{font-size:1rem;font-weight:700;color:#ff6c6c;font-family:'Orbitron',sans-serif}
+    #canvas-wrap{position:relative;border-radius:10px;overflow:hidden;box-shadow:0 0 40px #ff6c6c22;touch-action:none}
+    canvas{display:block}
+    #overlay{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;background:#05051099;backdrop-filter:blur(6px);border-radius:10px;z-index:10}
+    #overlay.hidden{display:none}
+    #obox{background:#0d0d1e;border:1px solid #ff6c6c;border-radius:16px;padding:28px 36px;text-align:center;box-shadow:0 0 40px #ff6c6c33;animation:popIn .3s ease}
+    @keyframes popIn{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+    #obox h2{font-family:'Orbitron',sans-serif;font-size:1.5rem;color:#ff6c6c;margin-bottom:8px}
+    #obox p{color:#666;font-size:.9rem;margin-bottom:20px}
+    .btn{padding:10px 28px;background:#ff6c6c;color:#050510;border:none;border-radius:20px;font-family:'Orbitron',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:transform .15s;margin:4px}
+    .btn:hover{transform:scale(1.05)}
+    #hint{font-size:.75rem;color:#333;font-family:'Orbitron',sans-serif;text-align:center}
+  </style>
+</head>
+<body>
+  <nav class="game-nav">
+    <a href="index.html" class="back-btn">← Hub</a>
+    <span class="game-nav-title">🎯 Breakout Blitz</span>
+    <span class="game-nav-hs">🏆 <span id="nav-hs">0</span></span>
+  </nav>
+  <canvas id="bgCanvas"></canvas>
+  <div id="wrap">
+    <h1>🎯 Breakout Blitz</h1>
+    <div id="stats">
+      <div class="sb"><span class="sl">SCORE</span><span class="sv" id="score">0</span></div>
+      <div class="sb"><span class="sl">LEVEL</span><span class="sv" id="level">1</span></div>
+      <div class="sb"><span class="sl">LIVES</span><span class="sv" id="lives">❤️❤️❤️</span></div>
+      <div class="sb"><span class="sl">BEST</span><span class="sv" id="best">0</span></div>
+    </div>
+    <div id="canvas-wrap">
+      <canvas id="gc" width="400" height="480"></canvas>
+      <div id="overlay">
+        <div id="obox">
+          <h2 id="otitle">🎯 Breakout Blitz</h2>
+          <p id="omsg">Smash all the bricks!</p>
+          <button class="btn" id="startBtn">▶ START</button>
+          <br/><a href="index.html" class="hub-link" style="margin-top:10px;display:inline-block">🏠 Hub</a>
+        </div>
+      </div>
+    </div>
+    <p id="hint">Mouse / Touch to move paddle · Click to launch</p>
+  </div>
+  <script src="breakout.js"></script>
+</body>
+</html>

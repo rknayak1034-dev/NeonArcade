@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🎮 NeonArcade — Free Online Games</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="hub.css"/>
+</head>
+<body>
+
+  <!-- Starfield -->
+  <canvas id="bgCanvas"></canvas>
+
+  <!-- ── NAVBAR ── -->
+  <nav id="navbar">
+    <div class="nav-logo">🎮 <span>NeonArcade</span></div>
+    <div class="nav-links">
+      <a href="#games">Games</a>
+      <a href="#leaderboard">Scores</a>
+      <a href="#about">About</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="nav-score-pill">🏆 <span id="nav-total-score">0</span> pts</div>
+      <a href="payment.html" id="upgrade-btn" style="padding:5px 14px;background:linear-gradient(135deg,#ffcc00,#ff9944);color:#050510;border:none;border-radius:16px;font-family:'Orbitron',sans-serif;font-size:0.7rem;font-weight:700;cursor:pointer;text-decoration:none;letter-spacing:1px;box-shadow:0 0 14px #ffcc0044;transition:all 0.2s">⚡ UPGRADE</a>
+      <div id="nav-user-pill" style="display:none;align-items:center;gap:8px;background:#0d0d1e;border:1px solid #2a2a4a;border-radius:20px;padding:4px 14px;font-family:'Orbitron',sans-serif;font-size:0.75rem;color:#4cff91">
+        <span id="nav-avatar"></span>
+        <span id="nav-username"></span>
+      </div>
+      <button id="nav-logout-btn" style="display:none;padding:5px 14px;background:transparent;border:1px solid #ff6c6c44;border-radius:16px;color:#ff6c6c;font-family:'Orbitron',sans-serif;font-size:0.7rem;cursor:pointer;transition:all 0.2s" onmouseover="this.style.background='#ff6c6c22'" onmouseout="this.style.background='transparent'">Logout</button>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section id="hero">
+    <div id="hero-content">
+      <p id="hero-sub">FREE ONLINE ARCADE</p>
+      <h1 id="hero-title">NEON<br/>ARCADE</h1>
+      <p id="hero-desc">5 classic games. Infinite fun. No downloads needed.</p>
+      <a href="#games" class="hero-btn">▶ PLAY NOW</a>
+    </div>
+    <div id="hero-icons">
+      <span class="float-icon" style="--d:0s">🐍</span>
+      <span class="float-icon" style="--d:0.4s">🧱</span>
+      <span class="float-icon" style="--d:0.8s">🃏</span>
+      <span class="float-icon" style="--d:1.2s">🐦</span>
+      <span class="float-icon" style="--d:1.6s">🎯</span>
+    </div>
+  </section>
+
+  <!-- ── GAMES GRID ── -->
+  <section id="games">
+    <h2 class="section-title">🕹️ Choose Your Game</h2>
+    <div id="games-grid">
+
+      <div class="game-card" data-game="snake">
+        <div class="card-glow"></div>
+        <div class="card-icon">🐍</div>
+        <div class="card-info">
+          <h3>Fantasy Snake</h3>
+          <p>Eat, grow, evolve. 8 snake types & power-ups!</p>
+          <div class="card-tags">
+            <span class="tag">Arcade</span>
+            <span class="tag">Strategy</span>
+          </div>
+          <div class="card-meta">
+            <span>⭐ 4.9</span>
+            <span>🏆 Best: <strong id="hs-snake">0</strong></span>
+          </div>
+        </div>
+        <a href="snake.html" class="play-btn">▶ PLAY</a>
+      </div>
+
+      <div class="game-card" data-game="tetris">
+        <div class="card-glow"></div>
+        <div class="card-icon">🧱</div>
+        <div class="card-info">
+          <h3>Neon Tetris</h3>
+          <p>Stack blocks, clear lines, beat your high score!</p>
+          <div class="card-tags">
+            <span class="tag">Puzzle</span>
+            <span class="tag">Classic</span>
+          </div>
+          <div class="card-meta">
+            <span>⭐ 4.8</span>
+            <span>🏆 Best: <strong id="hs-tetris">0</strong></span>
+          </div>
+        </div>
+        <a href="tetris.html" class="play-btn">▶ PLAY</a>
+      </div>
+
+      <div class="game-card" data-game="breakout">
+        <div class="card-glow"></div>
+        <div class="card-icon">🎯</div>
+        <div class="card-info">
+          <h3>Breakout Blitz</h3>
+          <p>Smash bricks with a bouncing ball. Don't miss!</p>
+          <div class="card-tags">
+            <span class="tag">Action</span>
+            <span class="tag">Classic</span>
+          </div>
+          <div class="card-meta">
+            <span>⭐ 4.7</span>
+            <span>🏆 Best: <strong id="hs-breakout">0</strong></span>
+          </div>
+        </div>
+        <a href="breakout.html" class="play-btn">▶ PLAY</a>
+      </div>
+
+      <div class="game-card" data-game="memory">
+        <div class="card-glow"></div>
+        <div class="card-icon">🃏</div>
+        <div class="card-info">
+          <h3>Memory Match</h3>
+          <p>Flip cards, find pairs, train your memory!</p>
+          <div class="card-tags">
+            <span class="tag">Memory</span>
+            <span class="tag">Casual</span>
+          </div>
+          <div class="card-meta">
+            <span>⭐ 4.6</span>
+            <span>🏆 Best: <strong id="hs-memory">0</strong></span>
+          </div>
+        </div>
+        <a href="memory.html" class="play-btn">▶ PLAY</a>
+      </div>
+
+      <div class="game-card" data-game="flappy">
+        <div class="card-glow"></div>
+        <div class="card-icon">🐦</div>
+        <div class="card-info">
+          <h3>Flappy Neon</h3>
+          <p>Tap to fly through neon pipes. How far can you go?</p>
+          <div class="card-tags">
+            <span class="tag">Reflex</span>
+            <span class="tag">Endless</span>
+          </div>
+          <div class="card-meta">
+            <span>⭐ 4.8</span>
+            <span>🏆 Best: <strong id="hs-flappy">0</strong></span>
+          </div>
+        </div>
+        <a href="flappy.html" class="play-btn">▶ PLAY</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── LEADERBOARD ── -->
+  <section id="leaderboard">
+    <h2 class="section-title">🏆 Your High Scores</h2>
+    <div id="leaderboard-table">
+      <div class="lb-row lb-header">
+        <span>GAME</span><span>BEST SCORE</span><span>STATUS</span>
+      </div>
+      <div class="lb-row"><span>🐍 Fantasy Snake</span><span id="lb-snake">0</span><span id="lb-snake-s" class="lb-status">—</span></div>
+      <div class="lb-row"><span>🧱 Neon Tetris</span><span id="lb-tetris">0</span><span id="lb-tetris-s" class="lb-status">—</span></div>
+      <div class="lb-row"><span>🎯 Breakout Blitz</span><span id="lb-breakout">0</span><span id="lb-breakout-s" class="lb-status">—</span></div>
+      <div class="lb-row"><span>🃏 Memory Match</span><span id="lb-memory">0</span><span id="lb-memory-s" class="lb-status">—</span></div>
+      <div class="lb-row"><span>🐦 Flappy Neon</span><span id="lb-flappy">0</span><span id="lb-flappy-s" class="lb-status">—</span></div>
+    </div>
+  </section>
+
+  <!-- ── ABOUT ── -->
+  <section id="about">
+    <h2 class="section-title">⚡ About NeonArcade</h2>
+    <div id="about-grid">
+      <div class="about-card">
+        <span class="about-icon">🚀</span>
+        <h4>Instant Play</h4>
+        <p>No downloads, no installs. Open and play instantly in any browser.</p>
+      </div>
+      <div class="about-card">
+        <span class="about-icon">📱</span>
+        <h4>Mobile Ready</h4>
+        <p>Touch controls & D-pads built in. Play on phone, tablet or desktop.</p>
+      </div>
+      <div class="about-card">
+        <span class="about-icon">🏆</span>
+        <h4>Track Scores</h4>
+        <p>High scores saved locally. Beat your personal best every session.</p>
+      </div>
+      <div class="about-card">
+        <span class="about-icon">🎨</span>
+        <h4>Neon Visuals</h4>
+        <p>Stunning retro-neon aesthetic with smooth animations and effects.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PRO BANNER ── -->
+  <section style="position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 40px 60px">
+    <div style="background:linear-gradient(135deg,#0d0d1e,#1a0d2e);border:1px solid #ffcc0033;border-radius:24px;padding:40px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px;box-shadow:0 0 60px #ffcc0011">
+      <div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:.7rem;letter-spacing:3px;color:#ffcc0088;margin-bottom:8px">UNLOCK EVERYTHING</div>
+        <h2 style="font-family:'Orbitron',sans-serif;font-size:1.6rem;font-weight:900;color:#fff;margin-bottom:8px">Go <span style="color:#ffcc00">Pro</span> Today</h2>
+        <p style="font-size:.9rem;color:#555;max-width:400px">Remove all ads, unlock exclusive snake skins, get priority support and access all 40 games forever.</p>
+        <div style="display:flex;gap:16px;margin-top:16px;flex-wrap:wrap">
+          <span style="font-size:.8rem;color:#4cff91">✅ No Ads</span>
+          <span style="font-size:.8rem;color:#4cff91">✅ Exclusive Skins</span>
+          <span style="font-size:.8rem;color:#4cff91">✅ All 40 Games</span>
+          <span style="font-size:.8rem;color:#4cff91">✅ Priority Support</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+        <div style="font-family:'Orbitron',sans-serif;font-size:2rem;font-weight:900;color:#ffcc00">₹199<span style="font-size:.9rem;color:#555">/mo</span></div>
+        <a href="payment.html" style="padding:14px 36px;background:linear-gradient(135deg,#ffcc00,#ff9944);color:#050510;border-radius:28px;text-decoration:none;font-family:'Orbitron',sans-serif;font-size:.9rem;font-weight:900;letter-spacing:1px;box-shadow:0 0 30px #ffcc0066;transition:all .2s">⚡ UPGRADE NOW</a>
+        <div style="font-size:.72rem;color:#333">7-day money back guarantee</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CREATOR SECTION -->
+  <section id="creator-section">
+    <div id="creator-card">
+      <div id="creator-glow-1"></div>
+      <div id="creator-glow-2"></div>
+      <div id="creator-left">
+        <div id="creator-avatar">&#x1F451;</div>
+        <div id="creator-badge">FOUNDER &amp; CREATOR</div>
+      </div>
+      <div id="creator-right">
+        <p id="creator-eyebrow">&#x2726; MEET THE CREATOR</p>
+        <h2 id="creator-name">Lochan Kumar Nayak</h2>
+        <p id="creator-title">Founder &amp; Owner &middot; NeonArcade</p>
+        <p id="creator-bio">NeonArcade was designed, built, and launched by <strong>Lochan Kumar Nayak</strong> &mdash; a passionate developer who believes gaming should be free, fun, and accessible to everyone. Every game, every feature, and every pixel on this platform was crafted with love.</p>
+        <div id="creator-tags">
+          <span class="ctag">&#x1F3AE; Game Developer</span>
+          <span class="ctag">&#x1F4BB; Frontend Engineer</span>
+          <span class="ctag">&#x1F680; Founder</span>
+          <span class="ctag">&#x1F3A8; UI Designer</span>
+        </div>
+        <div id="creator-quote">
+          <span id="quote-mark">&ldquo;</span>
+          <span id="quote-text">Build things that make people smile. That&rsquo;s the whole point.</span>
+          <span id="quote-author">&mdash; Lochan Kumar Nayak</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer id="footer">
+    <div class="footer-logo">&#x1F3AE; NeonArcade</div>
+    <div id="footer-owner">
+      <span id="footer-owner-label">Founded &amp; Built by</span>
+      <span id="footer-owner-name">&#x1F451; Lochan Kumar Nayak</span>
+    </div>
+    <p class="footer-copy">&copy; 2025 NeonArcade &middot; All rights reserved &middot; Built with &#x2764;&#xFE0F; using HTML5 &middot; CSS3 &middot; Vanilla JS</p>
+    <div class="footer-games">
+      <a href="snake.html">&#x1F40D; Snake</a>
+      <a href="tetris.html">&#x1F9F1; Tetris</a>
+      <a href="breakout.html">&#x1F3AF; Breakout</a>
+      <a href="memory.html">&#x1F0CF; Memory</a>
+      <a href="flappy.html">&#x1F426; Flappy</a>
+    </div>
+  </footer>
+
+  <script>
+    // ── Auth gate: redirect to landing if no session ──
+    const session = JSON.parse(localStorage.getItem('na_session') || 'null');
+    if (!session) { window.location.href = 'landing.html'; }
+
+    // ── Show user in navbar ──
+    if (session) {
+      const pill = document.getElementById('nav-user-pill');
+      const logoutBtn = document.getElementById('nav-logout-btn');
+      document.getElementById('nav-avatar').textContent   = session.avatar || '🎮';
+      document.getElementById('nav-username').textContent = session.isGuest ? 'Guest' : session.name;
+      pill.style.display = 'flex';
+      logoutBtn.style.display = 'block';
+      logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('na_session');
+        window.location.href = 'landing.html';
+      });
+    }
+
+    // ── Starfield ──
+    const bgC = document.getElementById('bgCanvas');
+    const bgX = bgC.getContext('2d');
+    bgC.width = window.innerWidth; bgC.height = window.innerHeight;
+    const stars = Array.from({length:160}, () => ({
+      x: Math.random()*bgC.width, y: Math.random()*bgC.height,
+      r: Math.random()*1.5+0.3, s: Math.random()*0.4+0.1
+    }));
+    function drawBg() {
+      bgX.fillStyle='#050510'; bgX.fillRect(0,0,bgC.width,bgC.height);
+      stars.forEach(s => {
+        s.y += s.s; if(s.y > bgC.height) { s.y=0; s.x=Math.random()*bgC.width; }
+        bgX.beginPath(); bgX.arc(s.x,s.y,s.r,0,Math.PI*2);
+        bgX.fillStyle=`rgba(255,255,255,${0.3+s.r*0.3})`; bgX.fill();
+      });
+      requestAnimationFrame(drawBg);
+    }
+    drawBg();
+    window.addEventListener('resize', () => { bgC.width=window.innerWidth; bgC.height=window.innerHeight; });
+
+    // ── Load high scores from localStorage ──
+    const games = ['snake','tetris','breakout','memory','flappy'];
+    const keys  = { snake:'snakeHS', tetris:'tetrisHS', breakout:'breakoutHS', memory:'memoryHS', flappy:'flappyHS' };
+    const statuses = [
+      [0,'—'],[1,'Beginner 🌱'],[10,'Rookie ⚡'],[25,'Pro 🔥'],[50,'Master 🏆'],[100,'Legend 🐉']
+    ];
+    function getStatus(s) {
+      let st = statuses[0][1];
+      for(const [t,l] of statuses) { if(s>=t) st=l; }
+      return st;
+    }
+    let total = 0;
+    games.forEach(g => {
+      const s = parseInt(localStorage.getItem(keys[g])||'0');
+      total += s;
+      document.getElementById('hs-'+g).textContent = s;
+      document.getElementById('lb-'+g).textContent  = s;
+      document.getElementById('lb-'+g+'-s').textContent = getStatus(s);
+    });
+    document.getElementById('nav-total-score').textContent = total;
+  </script>
+</body>
+</html>

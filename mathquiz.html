@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>🧮 Math Quiz — NeonArcade</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="game-shell.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#050510;color:#e0e0e0;font-family:'Rajdhani',sans-serif;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:70px 16px 40px}
+#wrap{display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;max-width:420px;position:relative;z-index:1}
+h1{font-family:'Orbitron',sans-serif;font-size:1.8rem;font-weight:900;color:#4cff91;text-shadow:0 0 20px #4cff9199;letter-spacing:3px}
+#stats{display:flex;gap:16px;background:#0d0d1e;border:1px solid #1e1e3a;border-radius:12px;padding:8px 20px;width:100%;justify-content:space-around}
+.sb{display:flex;flex-direction:column;align-items:center}.sl{font-size:.6rem;letter-spacing:2px;color:#444;font-family:'Orbitron',sans-serif}.sv{font-size:1rem;font-weight:700;color:#4cff91;font-family:'Orbitron',sans-serif}
+#question-box{background:#0d0d1e;border:1px solid #1e1e3a;border-radius:20px;padding:32px;text-align:center;width:100%;box-shadow:0 0 30px #4cff9111}
+#question{font-family:'Orbitron',sans-serif;font-size:2rem;font-weight:900;color:#fff;margin-bottom:8px}
+#timer-bar-wrap{width:100%;height:6px;background:#1e1e3a;border-radius:3px;overflow:hidden;margin-top:8px}
+#timer-bar{height:100%;background:#4cff91;border-radius:3px;transition:width .1s linear}
+#options{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.opt{padding:16px;background:#0d0d1e;border:1px solid #1e1e3a;border-radius:14px;font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:700;color:#fff;cursor:pointer;transition:all .2s;text-align:center}
+.opt:hover{border-color:#4cff91;color:#4cff91;background:#4cff9111}
+.opt.correct{background:#4cff9133;border-color:#4cff91;color:#4cff91;pointer-events:none}
+.opt.wrong{background:#ff6c6c33;border-color:#ff6c6c;color:#ff6c6c;pointer-events:none}
+.opt.reveal{background:#4cff9122;border-color:#4cff9166;pointer-events:none}
+#msg{font-family:'Orbitron',sans-serif;font-size:.9rem;min-height:24px;text-align:center}
+.btn{padding:10px 28px;background:#4cff91;color:#050510;border:none;border-radius:20px;font-family:'Orbitron',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:transform .15s}
+.btn:hover{transform:scale(1.05)}
+#diff{display:flex;gap:8px}
+.dbtn{padding:4px 14px;border:1px solid #222;border-radius:16px;background:#0d0d1e;color:#555;cursor:pointer;font-size:.7rem;font-family:'Orbitron',sans-serif;transition:all .2s}
+.dbtn:hover{border-color:#4cff91;color:#4cff91}
+.dbtn.active{background:#4cff91;color:#050510;border-color:#4cff91;font-weight:700}
+</style>
+</head>
+<body>
+<nav class="game-nav"><a href="index.html" class="back-btn">← Hub</a><span class="game-nav-title">🧮 Math Quiz</span><span class="game-nav-hs">🏆 <span id="nav-hs">0</span></span></nav>
+<div id="wrap">
+<h1>🧮 Math Quiz</h1>
+<div id="stats">
+  <div class="sb"><span class="sl">SCORE</span><span class="sv" id="score">0</span></div>
+  <div class="sb"><span class="sl">Q</span><span class="sv" id="qnum">0/10</span></div>
+  <div class="sb"><span class="sl">STREAK</span><span class="sv" id="streak">0</span></div>
+  <div class="sb"><span class="sl">BEST</span><span class="sv" id="best">0</span></div>
+</div>
+<div id="diff">
+  <button class="dbtn active" data-level="1">Easy</button>
+  <button class="dbtn" data-level="2">Medium</button>
+  <button class="dbtn" data-level="3">Hard</button>
+</div>
+<div id="question-box">
+  <div id="question">Press Start!</div>
+  <div id="timer-bar-wrap"><div id="timer-bar" style="width:100%"></div></div>
+</div>
+<div id="options"></div>
+<div id="msg"></div>
+<button class="btn" id="startBtn">▶ START QUIZ</button>
+<a href="index.html" class="hub-link">🏠 Back to Hub</a>
+</div>
+<script>
+let score=0,qnum=0,streak=0,best=parseInt(localStorage.getItem('mathHS')||'0'),level=1,answer,timerInterval,timeLeft,running=false;
+document.getElementById('best').textContent=best;document.getElementById('nav-hs').textContent=best;
+
+function genQ(){
+  const ops=['+','-','×','÷'];
+  let a,b,op,ans;
+  if(level===1){a=Math.floor(Math.random()*20)+1;b=Math.floor(Math.random()*20)+1;op=ops[Math.floor(Math.random()*2)];}
+  else if(level===2){a=Math.floor(Math.random()*50)+1;b=Math.floor(Math.random()*50)+1;op=ops[Math.floor(Math.random()*3)];}
+  else{a=Math.floor(Math.random()*100)+1;b=Math.floor(Math.random()*100)+1;op=ops[Math.floor(Math.random()*4)];}
+  if(op==='÷'){b=Math.floor(Math.random()*11)+1;a=b*(Math.floor(Math.random()*11)+1);}
+  if(op==='+')ans=a+b;else if(op==='-')ans=a-b;else if(op==='×')ans=a*b;else ans=a/b;
+  return{q:`${a} ${op} ${b} = ?`,ans};
+}
+
+function nextQ(){
+  if(qnum>=10){endGame();return;}
+  clearInterval(timerInterval);timeLeft=level===1?15:level===2?10:7;
+  const{q,ans}=genQ();answer=ans;qnum++;
+  document.getElementById('question').textContent=q;
+  document.getElementById('qnum').textContent=qnum+'/10';
+  document.getElementById('msg').textContent='';
+  // Generate options
+  const opts=new Set([ans]);
+  while(opts.size<4){const d=Math.floor(Math.random()*10)-5;if(d!==0)opts.add(ans+d);}
+  const arr=[...opts].sort(()=>Math.random()-.5);
+  const optDiv=document.getElementById('options');optDiv.innerHTML='';
+  arr.forEach(v=>{
+    const b=document.createElement('div');b.className='opt';b.textContent=v;
+    b.addEventListener('click',()=>pick(b,v));optDiv.appendChild(b);
+  });
+  timerInterval=setInterval(()=>{
+    timeLeft-=.1;document.getElementById('timer-bar').style.width=(timeLeft/(level===1?15:level===2?10:7)*100)+'%';
+    if(timeLeft<=0){clearInterval(timerInterval);timeOut();}
+  },100);
+}
+
+function pick(btn,val){
+  clearInterval(timerInterval);
+  document.querySelectorAll('.opt').forEach(b=>{b.classList.add('reveal');if(parseInt(b.textContent)===answer)b.classList.add('correct');});
+  if(val===answer){
+    btn.className='opt correct';streak++;score+=10+(streak>1?streak*2:0);
+    document.getElementById('msg').textContent=`✅ Correct! +${10+(streak>1?streak*2:0)}`;
+  }else{
+    btn.className='opt wrong';streak=0;
+    document.getElementById('msg').textContent='❌ Wrong!';
+  }
+  document.getElementById('score').textContent=score;document.getElementById('streak').textContent=streak;
+  setTimeout(nextQ,900);
+}
+
+function timeOut(){
+  document.querySelectorAll('.opt').forEach(b=>{b.classList.add('reveal');if(parseInt(b.textContent)===answer)b.classList.add('correct');});
+  streak=0;document.getElementById('streak').textContent=0;
+  document.getElementById('msg').textContent='⏰ Time Up!';
+  setTimeout(nextQ,900);
+}
+
+function endGame(){
+  running=false;
+  if(score>best){best=score;localStorage.setItem('mathHS',best);document.getElementById('best').textContent=best;document.getElementById('nav-hs').textContent=best;}
+  document.getElementById('question').textContent='Game Over!';
+  document.getElementById('options').innerHTML='';
+  document.getElementById('msg').textContent=`Final Score: ${score}`;
+  document.getElementById('startBtn').style.display='block';
+  document.getElementById('timer-bar').style.width='0%';
+}
+
+document.getElementById('startBtn').addEventListener('click',()=>{
+  score=0;qnum=0;streak=0;running=true;
+  document.getElementById('score').textContent=0;document.getElementById('streak').textContent=0;
+  document.getElementById('startBtn').style.display='none';
+  nextQ();
+});
+document.querySelectorAll('.dbtn').forEach(b=>{b.addEventListener('click',()=>{document.querySelector('.dbtn.active').classList.remove('active');b.classList.add('active');level=parseInt(b.dataset.level);});});
+</script>
+</body>
+</html>

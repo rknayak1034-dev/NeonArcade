@@ -1,0 +1,32 @@
+/* Shared game page nav shell */
+.game-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 24px;
+  background: #05051088; backdrop-filter: blur(12px);
+  border-bottom: 1px solid #1e1e3a;
+}
+.back-btn {
+  color: #4cff91; text-decoration: none;
+  font-family: 'Orbitron', sans-serif; font-size: 0.75rem;
+  font-weight: 700; letter-spacing: 1px;
+  padding: 5px 14px; border: 1px solid #4cff9144;
+  border-radius: 16px; background: #4cff9111;
+  transition: all 0.2s;
+}
+.back-btn:hover { background: #4cff91; color: #050510; }
+.game-nav-title {
+  font-family: 'Orbitron', sans-serif; font-size: 0.9rem;
+  font-weight: 700; color: #fff;
+}
+.game-nav-hs {
+  font-family: 'Orbitron', sans-serif; font-size: 0.75rem;
+  color: #ffcc00;
+}
+.hub-link {
+  display: inline-block; margin-top: 10px;
+  color: #666; text-decoration: none; font-size: 0.8rem;
+  font-family: 'Orbitron', sans-serif;
+  transition: color 0.2s;
+}
+.hub-link:hover { color: #4cff91; }
